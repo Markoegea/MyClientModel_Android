@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">My Client Model</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="maps_api">@string/maps_api_value</string>
+    <string name="maps_api_value" translatable="false">@string/maps_api_key</string>
+    <string-array name="document_type_spinner">
+        <item>T.I</item>
+        <item>C.C</item>
+        <item>C.E</item>
+        <item>N.I.P</item>
+        <item>N.U.I.P</item>
+    </string-array>
+</resources>

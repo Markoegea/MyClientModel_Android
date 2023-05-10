@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/rlMessageContainer"
+    android:padding="8dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="User"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="10dp"
+        android:id="@+id/txtMessageUser"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Message"
+        android:textSize="15sp"
+        android:textColor="@color/black"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/txtMessageUser"
+        android:layout_margin="10dp"
+        android:id="@+id/txtMessageText"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Time"
+        android:textSize="15sp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/txtMessageText"
+        android:layout_margin="10dp"
+        android:id="@+id/txtMessageTime"/>
+</RelativeLayout>

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.kingmarco.myclientmodel.Fragments.Home.HomeFragment"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_chatFragment"
+            app:destination="@id/chatFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_productDetailsFragment"
+            app:destination="@id/productDetailsFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_promotionFragment"
+            app:destination="@id/promotionFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_cartFragment"
+            app:destination="@id/cartFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="com.kingmarco.myclientmodel.Fragments.Chat.ChatFragment"
+        tools:layout="@layout/fragment_chat" />
+    <fragment
+        android:id="@+id/productDetailsFragment"
+        android:name="com.kingmarco.myclientmodel.Fragments.Home.ProductDetailsFragment"
+        tools:layout="@layout/fragment_product_details" />
+    <fragment
+        android:id="@+id/promotionFragment"
+        android:name="com.kingmarco.myclientmodel.Fragments.Promotions.PromotionFragment"
+        tools:layout="@layout/fragment_promotion" >
+        <action
+            android:id="@+id/action_promotionFragment_to_promotionDetailsFragment"
+            app:destination="@id/promotionDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/promotionDetailsFragment"
+        android:name="com.kingmarco.myclientmodel.Fragments.Promotions.PromotionDetailsFragment"
+        tools:layout="@layout/fragment_promotion_details" >
+        <action
+            android:id="@+id/action_promotionDetailsFragment_to_productDetailsFragment"
+            app:destination="@id/productDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/cartFragment"
+        android:name="com.kingmarco.myclientmodel.Fragments.Cart.CartFragment"
+        tools:layout="@layout/fragment_cart" >
+        <action
+            android:id="@+id/action_cartFragment_to_cartDetailsFragment"
+            app:destination="@id/cartDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/cartDetailsFragment"
+        android:name="com.kingmarco.myclientmodel.Fragments.Cart.CartDetailsFragment"
+        tools:layout="@layout/fragment_cart_details" >
+        <action
+            android:id="@+id/action_cartDetailsFragment_to_promotionDetailsFragment"
+            app:destination="@id/promotionDetailsFragment" />
+        <action
+            android:id="@+id/action_cartDetailsFragment_to_productDetailsFragment"
+            app:destination="@id/productDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.kingmarco.myclientmodel.Fragments.Login.LoginFragment"
+        tools:layout="@layout/fragment_login" >
+        <action
+            android:id="@+id/action_loginFragment_to_clientAccountFragment"
+            app:destination="@id/clientAccountFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_registerClientFragment"
+            app:destination="@id/registerClientFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/clientAccountFragment"
+        android:name="com.kingmarco.myclientmodel.Fragments.Login.ClientAccountFragment"
+        tools:layout="@layout/fragment_client_account" >
+        <action
+            android:id="@+id/action_clientAccountFragment_to_changeInfoAccountFragment"
+            app:destination="@id/changeInfoAccountFragment" />
+        <action
+            android:id="@+id/action_clientAccountFragment_to_changeLocationDataFragment"
+            app:destination="@id/changeLocationDataFragment" />
+        <action
+            android:id="@+id/action_clientAccountFragment_to_changeLoginDataFragment"
+            app:destination="@id/changeLoginDataFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/registerClientFragment"
+        android:name="com.kingmarco.myclientmodel.Fragments.Login.RegisterClientFragment"
+        tools:layout="@layout/fragment_register_client" />
+    <fragment
+        android:id="@+id/changeInfoAccountFragment"
+        android:name="com.kingmarco.myclientmodel.Fragments.Login.ChangeInfoAccountFragment"
+        tools:layout="@layout/fragment_change_info_account" />
+    <fragment
+        android:id="@+id/changeLoginDataFragment"
+        android:name="com.kingmarco.myclientmodel.Fragments.Login.ChangeLoginDataFragment"
+        tools:layout="@layout/fragment_change_login_data" />
+    <fragment
+        android:id="@+id/changeLocationDataFragment"
+        android:name="com.kingmarco.myclientmodel.Fragments.Login.ChangeLocationDataFragment"
+        tools:layout="@layout/fragment_change_location_data" />
+</navigation>

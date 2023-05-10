@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "843961118827",
+    "project_id": "first-model-client",
+    "storage_bucket": "first-model-client.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:843961118827:android:dbba0616899634b33fc12e",
+        "android_client_info": {
+          "package_name": "com.kingmarco.myclientmodel"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlE4bxcVymID77Q5so_lYxOaBAkCSgsF0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
