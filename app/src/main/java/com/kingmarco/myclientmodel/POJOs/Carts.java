@@ -5,6 +5,8 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
+import com.google.firebase.Timestamp;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,15 +14,16 @@ import java.util.Arrays;
 /**The class cart that is used to organize the information of the cart and parcel it to pass to others fragments*/
 public class Carts implements Parcelable {
 
-    private int id;
-    private ArrayList<Parcelable> purchasedProducts;
-    private Clients buyerClient;
+    private Long id;
+    private ArrayList<String> purchasedProducts;
+    private Long buyerClient;
     private String owner;
     private int price;
     private String status;
     private String direction;
-    private LocalDate purchasedDate;
-    private LocalDate arrivedDate;
+    private Timestamp purchasedDate;
+    private Timestamp arrivedDate;
+    private String lastUpdateBy;
 
     public static final Creator<Carts> CREATOR = new Creator<>() {
         @Override
@@ -34,7 +37,7 @@ public class Carts implements Parcelable {
         }
     };
 
-    public Carts(int id,ArrayList<Parcelable> purchasedProducts, Clients buyerClient, String owner, int price, String status, String direction, LocalDate purchasedDate,LocalDate arrivedDate) {
+    public Carts(Long id,ArrayList<String> purchasedProducts, Long buyerClient, String owner, int price, String status, String direction, Timestamp purchasedDate, Timestamp arrivedDate) {
         this.id = id;
         this.purchasedProducts = purchasedProducts;
         this.buyerClient = buyerClient;
@@ -47,16 +50,16 @@ public class Carts implements Parcelable {
     }
 
     protected Carts(Parcel in){
-        this.id = in.readInt();
-        this.purchasedProducts = new ArrayList<>();
-        this.purchasedProducts.addAll(Arrays.asList(in.readParcelableArray(this.purchasedProducts.getClass().getClassLoader())));
-        this.buyerClient = in.readParcelable(this.buyerClient.getClass().getClassLoader());
+        this.id = in.readLong();
+        in.readList(this.purchasedProducts, String.class.getClassLoader());
+        this.buyerClient = in.readLong();
         this.owner = in.readString();
         this.price = in.readInt();
         this.status = in.readString();
         this.direction = in.readString();
-        this.purchasedDate = LocalDate.ofEpochDay(in.readLong());
-        this.arrivedDate = LocalDate.ofEpochDay(in.readLong());
+        this.purchasedDate = in.readParcelable(Timestamp.class.getClassLoader());
+        this.arrivedDate = in.readParcelable(Timestamp.class.getClassLoader());
+        this.lastUpdateBy = in.readString();
     }
 
     @Override
@@ -66,39 +69,40 @@ public class Carts implements Parcelable {
 
     @Override
     public void writeToParcel(@NonNull Parcel parcel, int i) {
-        parcel.writeInt(this.id);
-        parcel.writeParcelableArray(this.purchasedProducts.toArray(new Parcelable[0]),i);
-        parcel.writeParcelable(this.buyerClient,i);
+        parcel.writeLong(this.id);
+        parcel.writeList(this.purchasedProducts);
+        parcel.writeLong(this.buyerClient);
         parcel.writeString(this.owner);
         parcel.writeInt(this.price);
         parcel.writeString(this.status);
         parcel.writeString(this.direction);
-        parcel.writeLong(this.purchasedDate.toEpochDay());
-        parcel.writeLong(this.arrivedDate.toEpochDay());
+        this.purchasedDate.writeToParcel(parcel, i);
+        this.arrivedDate.writeToParcel(parcel, i);
+        parcel.writeString(this.lastUpdateBy);
     }
 
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public ArrayList<Parcelable> getPurchasedProducts() {
+    public ArrayList<String> getPurchasedProducts() {
         return purchasedProducts;
     }
 
-    public void setPurchasedProducts(ArrayList<Parcelable> purchasedProducts) {
+    public void setPurchasedProducts(ArrayList<String> purchasedProducts) {
         this.purchasedProducts = purchasedProducts;
     }
 
-    public Clients getBuyerClient() {
+    public Long getBuyerClient() {
         return buyerClient;
     }
 
-    public void setBuyerClient(Clients buyerClient) {
+    public void setBuyerClient(Long buyerClient) {
         this.buyerClient = buyerClient;
     }
 
@@ -134,19 +138,27 @@ public class Carts implements Parcelable {
         this.direction = direction;
     }
 
-    public LocalDate getPurchasedDate() {
+    public Timestamp getPurchasedDate() {
         return purchasedDate;
     }
 
-    public void setPurchasedDate(LocalDate purchasedDate) {
+    public void setPurchasedDate(Timestamp purchasedDate) {
         this.purchasedDate = purchasedDate;
     }
 
-    public LocalDate getArrivedDate() {
+    public Timestamp getArrivedDate() {
         return arrivedDate;
     }
 
-    public void setArrivedDate(LocalDate arrivedDate) {
+    public void setArrivedDate(Timestamp arrivedDate) {
         this.arrivedDate = arrivedDate;
+    }
+
+    public String getLastUpdateBy() {
+        return lastUpdateBy;
+    }
+
+    public void setLastUpdateBy(String lastUpdateBy) {
+        this.lastUpdateBy = lastUpdateBy;
     }
 }

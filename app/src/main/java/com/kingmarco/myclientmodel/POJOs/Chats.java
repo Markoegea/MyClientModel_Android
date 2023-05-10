@@ -18,7 +18,7 @@ public class Chats {
         this.name = name;
     }
 
-    public Chats(Long clientID, String image, String name) {
+    public Chats(Long clientID, String image, String name, Messages lastMessage) {
         this.clientID = clientID;
         this.image = image;
         this.name = name;

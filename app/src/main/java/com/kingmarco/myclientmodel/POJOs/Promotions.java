@@ -5,20 +5,17 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
+import com.google.firebase.Timestamp;
+
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
 /**The class PromoProduct that is used to organize the information of the PromoProduct and parcel it to other fragments*/
-public class Promotions implements Parcelable {
+public class Promotions extends Stock implements Parcelable {
 
-    private int id;
-    private String url;
-    private String promoName;
-    private ArrayList<Products> products;
-    private int newPrice;
-    private LocalDate finishDate;
-
+    private ArrayList<Long> products;
+    private Timestamp finishDate;
     public static final Creator<Promotions> CREATOR = new Creator<Promotions>() {
         @Override
         public Promotions createFromParcel(Parcel parcel) {
@@ -31,23 +28,21 @@ public class Promotions implements Parcelable {
         }
     };
 
-    public Promotions(String url, String promoName, ArrayList<Products> products, int newPrice, LocalDate finishDate) {
-        this.url = url;
-        this.promoName = promoName;
+    public Promotions(Long id, String promoName, int newPrice, ArrayList<String>  url, String lastUpdateBy, ArrayList<Long> products, Timestamp finishDate) {
+        super(id, promoName, newPrice, url, lastUpdateBy);
         this.products = products;
-        this.newPrice = newPrice;
         this.finishDate = finishDate;
     }
 
+    public Promotions() {
+        super();
+    }
+
     protected Promotions(Parcel in){
-        this.url = in.readString();
-        this.promoName = in.readString();
+        super(in);
         this.products = new ArrayList<>();
-        for( Parcelable parcelable: in.readParcelableArray(products.getClass().getClassLoader()) ){
-            products.add((Products) parcelable);
-        }
-        this.newPrice = in.readInt();
-        this.finishDate = LocalDate.ofEpochDay(in.readLong());
+        in.readList(this.products, Long.class.getClassLoader());
+        this.finishDate = in.readParcelable(Timestamp.class.getClassLoader());
     }
 
     @Override
@@ -57,50 +52,24 @@ public class Promotions implements Parcelable {
 
     @Override
     public void writeToParcel(@NonNull Parcel parcel, int i) {
-        parcel.writeString(this.url);
-        parcel.writeString(this.promoName);
-        parcel.writeParcelableArray(this.getProducts().toArray(new Products[0]),i);
-        parcel.writeInt(this.newPrice);
-        parcel.writeLong(this.finishDate.toEpochDay());
+        super.writeToParcel(parcel, i);
+        parcel.writeList(this.products);
+        this.finishDate.writeToParcel(parcel,i);
     }
 
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getPromoName() {
-        return promoName;
-    }
-
-    public void setPromoName(String promoName) {
-        this.promoName = promoName;
-    }
-
-    public ArrayList<Products> getProducts() {
+    public ArrayList<Long> getProducts() {
         return products;
     }
 
-    public void setProducts(ArrayList<Products> products) {
+    public void setProducts(ArrayList<Long> products) {
         this.products = products;
     }
 
-    public String getNewPrice() {
-        return new DecimalFormat("###,###,###").format(this.newPrice);
-    }
-
-    public void setNewPrice(int newPrice) {
-        this.newPrice = newPrice;
-    }
-
-    public LocalDate getFinishDate() {
+    public Timestamp getFinishDate() {
         return finishDate;
     }
 
-    public void setFinishDate(LocalDate finishDate) {
+    public void setFinishDate(Timestamp finishDate) {
         this.finishDate = finishDate;
     }
 }

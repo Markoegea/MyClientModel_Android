@@ -9,16 +9,10 @@ import java.util.ArrayList;
 
 /**The class Products that is used to organize the information of the Product parcel it to other fragments*/
 
-public class Products implements Parcelable {
+public class Products  extends Stock implements Parcelable {
 
-    //TODO: WHEN GET PRICE, DON'T GET A STRING INSTEAD A INT
-    //TODO: DO THE SAME WITH QUANTITY
-    private int id;
-    private int price;
     private int quantity;
-    private String name;
     private String description;
-    private ArrayList<String> url;
     private ArrayList<String> rating;
     private ArrayList<String> category;
 
@@ -34,36 +28,31 @@ public class Products implements Parcelable {
         }
     };
 
-    public Products(int id, int price, int quantity, String name, String description, ArrayList<String> url, ArrayList<String> rating, ArrayList<String> category) {
-        this.id = id;
-        this.price = price;
+    public Products(Long id, int price, String name, ArrayList<String> url, String lastUpdateBy, int quantity, String description, ArrayList<String> rating, ArrayList<String> category) {
+        super(id, name, price, url, lastUpdateBy);
         this.quantity = quantity;
-        this.name = name;
         this.description = description;
-        this.url = url;
         this.rating = rating;
         this.category = category;
     }
 
+    public Products() {
+        super();
+    }
+
     protected Products(Parcel in){
-        this.id = in.readInt();
-        this.price = in.readInt();
+        super(in);
         this.quantity = in.readInt();
-        this.name = in.readString();
         this.description = in.readString();
-        in.readStringList(this.url);
-        in.readStringList(this.rating);
-        in.readStringList(this.category);
+        this.rating = in.createStringArrayList();
+        this.category = in.createStringArrayList();
     }
 
     @Override
     public void writeToParcel(@NonNull Parcel parcel, int i) {
-        parcel.writeInt(this.id);
-        parcel.writeInt(this.price);
+        super.writeToParcel(parcel,i);
         parcel.writeInt(this.quantity);
-        parcel.writeString(this.name);
         parcel.writeString(this.description);
-        parcel.writeStringList(this.url);
         parcel.writeStringList(this.rating);
         parcel.writeStringList(this.category);
     }
@@ -73,40 +62,8 @@ public class Products implements Parcelable {
         return 0;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public ArrayList<String> getUrl() {
-        return url;
-    }
-
-    public void setUrl(ArrayList<String> url) {
-        this.url = url;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getPrice() {
-        return new DecimalFormat("###,###,###").format(price);
-    }
-
-    public void setPrice(int price) {
-        this.price = price;
-    }
-
-    public String getQuantity() {
-        return quantity+"";
+    public int getQuantity() {
+        return quantity;
     }
 
     public void setQuantity(int quantity) {
@@ -136,5 +93,4 @@ public class Products implements Parcelable {
     public void setRating(ArrayList<String> rating) {
         this.rating = rating;
     }
-
 }

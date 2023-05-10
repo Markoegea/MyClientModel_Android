@@ -13,7 +13,8 @@ public class Clients implements Parcelable {
     //TODO: Only for testing purposes
     public static ArrayList<Clients> clients = new ArrayList<>();
 
-    private int id;
+    private String id;
+    private int messagingId;
     //Personal information
     private String imageUrl;
     private String name;
@@ -29,9 +30,6 @@ public class Clients implements Parcelable {
     private Double longitude;
     private String directions;
 
-    //Login Data
-    private String email;
-    private String password;
 
     public static final Creator<Clients> CREATOR = new Creator<Clients>() {
         @Override
@@ -48,7 +46,9 @@ public class Clients implements Parcelable {
     public Clients() {
     }
 
-    public Clients(String imageUrl, String name, String lastName, String documentID, String documentType, int age, String gender, String phoneNumber, Double latitude, Double longitude, String directions, String email, String password) {
+    public Clients(String id, int messagingId, String imageUrl, String name, String lastName, String documentID, String documentType, int age, String gender, String phoneNumber, Double latitude, Double longitude, String directions) {
+        this.id = id;
+        this.messagingId = messagingId;
         this.imageUrl = imageUrl;
         this.name = name;
         this.lastName = lastName;
@@ -60,11 +60,11 @@ public class Clients implements Parcelable {
         this.latitude = latitude;
         this.longitude = longitude;
         this.directions = directions;
-        this.email = email;
-        this.password = password;
     }
 
     protected Clients(Parcel in){
+        this.id = in.readString();
+        this.messagingId = in.readInt();
         this.imageUrl = in.readString();
         this.name = in.readString();
         this.lastName = in.readString();
@@ -76,8 +76,6 @@ public class Clients implements Parcelable {
         this.latitude = in.readDouble();
         this.longitude = in.readDouble();
         this.directions = in.readString();
-        this.email = in.readString();
-        this.password = in.readString();
     }
 
     @Override
@@ -87,6 +85,8 @@ public class Clients implements Parcelable {
 
     @Override
     public void writeToParcel(@NonNull Parcel parcel, int i) {
+        parcel.writeString(this.id);
+        parcel.writeInt(this.messagingId);
         parcel.writeString(this.imageUrl);
         parcel.writeString(this.name);
         parcel.writeString(this.lastName);
@@ -98,8 +98,22 @@ public class Clients implements Parcelable {
         parcel.writeDouble(this.latitude);
         parcel.writeDouble(this.longitude);
         parcel.writeString(this.directions);
-        parcel.writeString(this.email);
-        parcel.writeString(this.password);
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public int getMessagingId() {
+        return messagingId;
+    }
+
+    public void setMessagingId(int messagingId) {
+        this.messagingId = messagingId;
     }
 
     public String getImageUrl() {
@@ -188,21 +202,5 @@ public class Clients implements Parcelable {
 
     public void setDirections(String directions) {
         this.directions = directions;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 }
