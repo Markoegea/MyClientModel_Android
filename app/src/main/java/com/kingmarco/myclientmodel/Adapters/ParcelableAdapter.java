@@ -92,10 +92,10 @@ public class ParcelableAdapter extends RecyclerView.Adapter<ParcelableAdapter.Vi
     /**Set the image, name, price and button action of the item in the recycler view*/
     private void withAPPromoProduct(Promotions promotions, ViewHolder holder){
         if(promotions.getUrl() != null){
-            new ImageThreads(promotions.getUrl(),holder.imageView,fragmentActivity).start();
+            //new ImageThreads(promotions.getUrl(),holder.imageView,fragmentActivity).start();
         }
-        holder.txtParcelableName.setText(promotions.getPromoName());
-        holder.txtParcelablePrice.setText(promotions.getNewPrice());
+        //holder.txtParcelableName.setText(promotions.getPromoName());
+        //holder.txtParcelablePrice.setText(promotions.getNewPrice());
         if (promoActionId == -1){return;}
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override

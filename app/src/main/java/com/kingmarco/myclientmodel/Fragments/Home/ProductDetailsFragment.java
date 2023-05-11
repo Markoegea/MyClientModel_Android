@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import com.kingmarco.myclientmodel.Adapters.ImagesAdapter;
-import com.kingmarco.myclientmodel.Auxiliary.SetLabelName;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
 import com.kingmarco.myclientmodel.POJOs.Products;
 import com.kingmarco.myclientmodel.R;
 

@@ -64,7 +64,7 @@ public class CartsAdapter extends RecyclerView.Adapter<CartsAdapter.ViewHolder>{
         if(cart.getPurchasedProducts() == null){return;}
 
         /**Check if the purchased product is a class of Product or PromoProduct*/
-        for(Parcelable parcelable: cart.getPurchasedProducts()){
+        /*for(Parcelable parcelable: cart.getPurchasedProducts()){
             if(parcelable instanceof Products){
                 if(isAProduct(holder,parcelable,name,hasImage)){
                     hasImage = true;
@@ -74,7 +74,7 @@ public class CartsAdapter extends RecyclerView.Adapter<CartsAdapter.ViewHolder>{
                     hasImage = true;
                 }
             }
-        }
+        }*/
         holder.txtProductName.setText(name);
 
         String date;
@@ -117,12 +117,12 @@ public class CartsAdapter extends RecyclerView.Adapter<CartsAdapter.ViewHolder>{
         Promotions cartPromo = (Promotions) promotion;
 
         if(cartPromo.getProducts() == null){return false;}
-        for(Products product : cartPromo.getProducts()){
+        /*for(Products product : cartPromo.getProducts()){
             name.append(product.getName()+", ");
         }
 
         if(cartPromo.getUrl() == null || hasImage){return false;}
-        new ImageThreads(cartPromo.getUrl(),holder.ivCart,fragmentActivity).start();
+        new ImageThreads(cartPromo.getUrl(),holder.ivCart,fragmentActivity).start();*/
         return true;
     }
 

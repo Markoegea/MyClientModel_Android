@@ -6,23 +6,13 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.kingmarco.myclientmodel.Adapters.CartsAdapter;
-import com.kingmarco.myclientmodel.Auxiliary.SetLabelName;
-import com.kingmarco.myclientmodel.BuildConfig;
-import com.kingmarco.myclientmodel.POJOs.Carts;
-import com.kingmarco.myclientmodel.POJOs.Clients;
-import com.kingmarco.myclientmodel.POJOs.Products;
-import com.kingmarco.myclientmodel.POJOs.Promotions;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
 import com.kingmarco.myclientmodel.R;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 /** The fragment that display a recycler view with the carts of the client*/
 public class CartFragment extends Fragment {

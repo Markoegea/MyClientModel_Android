@@ -41,9 +41,18 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.OnMapsSdkInitializedCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.kingmarco.myclientmodel.Auxiliary.InAppSnackBars;
-import com.kingmarco.myclientmodel.Auxiliary.SetLabelName;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.InAppSnackBars;
+import com.kingmarco.myclientmodel.Auxiliary.Enums.SnackBarsInfo;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.DeleteThis;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetFireStoreDB;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
 import com.kingmarco.myclientmodel.POJOs.Clients;
 import com.kingmarco.myclientmodel.R;
 
@@ -54,8 +63,10 @@ import java.util.Map;
 
 /**The fragment responsible to set or update the location information of the client*/
 public class ChangeLocationDataFragment extends Fragment implements OnMapReadyCallback,
-        OnMapsSdkInitializedCallback, InAppSnackBars {
+        OnMapsSdkInitializedCallback, GetFireStoreDB {
 
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final CollectionReference clientDB = db.collection("Clientes");
     private static final int MAPS_LAYOUT = 1;
     private static final int WRITE_LAYOUT = 2;
     private SetLabelName setLabelName;
@@ -66,7 +77,7 @@ public class ChangeLocationDataFragment extends Fragment implements OnMapReadyCa
     private MapView mapView;
     private GoogleMap googleMap;
     private EditText edtCountry, edtCity, edtAddress, edtLocation;
-    private Button btnUpload;
+    private FloatingActionButton btnUpload;
     private RadioGroup radioGroup;
     private Double longitude, latitude;
     private View contentView;
@@ -93,7 +104,10 @@ public class ChangeLocationDataFragment extends Fragment implements OnMapReadyCa
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setLabelName = (SetLabelName) getContext();
-        client = getArguments().getParcelable("client");
+        Bundle data = getArguments();
+        if (data != null){
+            client = getArguments().getParcelable("client");
+        }
     }
 
     @Override
@@ -185,14 +199,13 @@ public class ChangeLocationDataFragment extends Fragment implements OnMapReadyCa
     /**Update the location if the all fields are correct using the map*/
     private void onMapUpdateClick(View view) {
         if (latitude == null || longitude == null || edtLocation.getText().toString().isEmpty()){
-            showSnackBar("Tu Ubicacion esta en Blanco");
+            onCompleteFireStoreRequest(SnackBarsInfo.INCOMPLETE_INFO_ERROR);
             return;
         }
         client.setLatitude(latitude);
         client.setLongitude(longitude);
         client.setDirections(edtLocation.getText().toString());
-        showSnackBar("Tu Ubicacion se ha Actualizado Correctamente");
-        getActivity().onBackPressed();
+        uploadClient();
     }
 
     /**Update the location if the all fields are correct using the edit texts*/
@@ -200,15 +213,30 @@ public class ChangeLocationDataFragment extends Fragment implements OnMapReadyCa
         if (edtCountry.getText().toString().isEmpty()
                 || edtCity.getText().toString().isEmpty()
                 || edtAddress.getText().toString().isEmpty()) {
-            showSnackBar("Hay Espacios en Blanco");
+            onCompleteFireStoreRequest(SnackBarsInfo.INCOMPLETE_INFO_ERROR);
             return;
         }
+        client.setLatitude(null);
+        client.setLongitude(null);
         String direction = edtAddress.getText().toString() + ", " +
                 edtCity.getText().toString() + ", " +
                 edtCountry.getText().toString();
         client.setDirections(direction);
-        showSnackBar("Tu Ubicacion se ha Actualizado Correctamente");
-        getActivity().onBackPressed();
+        uploadClient();
+    }
+
+    private void uploadClient(){
+        DocumentReference documentReference = clientDB.document(client.getId());
+        documentReference.set(client).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()){
+                    onCompleteFireStoreRequest(SnackBarsInfo.UPDATE_SUCCESS);
+                } else{
+                    onCompleteFireStoreRequest(SnackBarsInfo.DATA_ERROR);
+                }
+            }
+        });
     }
 
     /**Move the camara to Colombia, and set the listener to add the marker*/
@@ -339,29 +367,7 @@ public class ChangeLocationDataFragment extends Fragment implements OnMapReadyCa
     }
 
     @Override
-    public void showSnackBar(String text) {
-        Snackbar snackbar = Snackbar.make(contentView,text, Snackbar.LENGTH_SHORT)
-                .setTextColor(getContext().getColor(R.color.white))
-                .setBackgroundTint(getContext().getColor(R.color.black));
-        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbar.getView().getLayoutParams();
-        params.gravity = Gravity.TOP;
-        snackbar.getView().setLayoutParams(params);
-        snackbar.show();
-    }
-
-    @Override
-    public void showSnackBar(String text, int backgroundColor) {
-        Snackbar.make(contentView,text, Snackbar.LENGTH_SHORT)
-                .setTextColor(getContext().getColor(R.color.white))
-                .setBackgroundTint(getContext().getColor(backgroundColor))
-                .show();
-    }
-
-    @Override
-    public void showSnackBar(String text, int backgroundColor, int textColor) {
-        Snackbar.make(contentView,text, Snackbar.LENGTH_SHORT)
-                .setTextColor(getContext().getColor(textColor))
-                .setBackgroundTint(getContext().getColor(backgroundColor))
-                .show();
+    public void onCompleteFireStoreRequest(SnackBarsInfo snackBarsInfo) {
+        InAppSnackBars.defineSnackBarInfo(snackBarsInfo,contentView,getContext(),getActivity(),true);
     }
 }

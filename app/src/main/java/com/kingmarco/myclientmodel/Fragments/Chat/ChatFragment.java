@@ -15,14 +15,11 @@ import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.Timestamp;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.kingmarco.myclientmodel.Auxiliary.MessagesStatus;
-import com.kingmarco.myclientmodel.Auxiliary.SetLabelName;
+import com.kingmarco.myclientmodel.Auxiliary.Enums.MessagesStatus;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
 import com.kingmarco.myclientmodel.POJOs.Chats;
 import com.kingmarco.myclientmodel.POJOs.Messages;
 import com.kingmarco.myclientmodel.R;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**The fragment responsible for show the messages from the firebase*/
 //TODO: THE REFERENCE OF THE MESSAGES WILL BE THE NAME OF THE CLIENT, AND ORGANIZE THE MESSAGE CORRECTLY IN THE REALTIME DATABASE

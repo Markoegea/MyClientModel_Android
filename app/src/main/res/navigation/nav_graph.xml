@@ -24,6 +24,9 @@
         <action
             android:id="@+id/action_homeFragment_to_cartFragment"
             app:destination="@id/cartFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_clientAccountFragment"
+            app:destination="@id/clientAccountFragment" />
     </fragment>
     <fragment
         android:id="@+id/chatFragment"

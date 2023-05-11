@@ -10,9 +10,6 @@ import java.util.ArrayList;
 /**The class Clients that is used to organize the information of the client and parcel it to pass to others fragments*/
 public class Clients implements Parcelable {
 
-    //TODO: Only for testing purposes
-    public static ArrayList<Clients> clients = new ArrayList<>();
-
     private String id;
     private int messagingId;
     //Personal information
@@ -22,7 +19,6 @@ public class Clients implements Parcelable {
     private String documentID;
     private String documentType;
     private int age;
-    private String gender;
     private String phoneNumber;
 
     //Location Data
@@ -46,7 +42,7 @@ public class Clients implements Parcelable {
     public Clients() {
     }
 
-    public Clients(String id, int messagingId, String imageUrl, String name, String lastName, String documentID, String documentType, int age, String gender, String phoneNumber, Double latitude, Double longitude, String directions) {
+    public Clients(String id, int messagingId, String imageUrl, String name, String lastName, String documentID, String documentType, int age, String phoneNumber, Double latitude, Double longitude, String directions) {
         this.id = id;
         this.messagingId = messagingId;
         this.imageUrl = imageUrl;
@@ -55,7 +51,6 @@ public class Clients implements Parcelable {
         this.documentID = documentID;
         this.documentType = documentType;
         this.age = age;
-        this.gender = gender;
         this.phoneNumber = phoneNumber;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -71,7 +66,6 @@ public class Clients implements Parcelable {
         this.documentID = in.readString();
         this.documentType = in.readString();
         this.age = in.readInt();
-        this.gender = in.readString();
         this.phoneNumber = in.readString();
         this.latitude = in.readDouble();
         this.longitude = in.readDouble();
@@ -93,7 +87,6 @@ public class Clients implements Parcelable {
         parcel.writeString(this.documentID);
         parcel.writeString(this.documentType);
         parcel.writeInt(this.age);
-        parcel.writeString(this.gender);
         parcel.writeString(this.phoneNumber);
         parcel.writeDouble(this.latitude);
         parcel.writeDouble(this.longitude);
@@ -162,14 +155,6 @@ public class Clients implements Parcelable {
 
     public void setAge(int age) {
         this.age = age;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
     }
 
     public String getPhoneNumber() {

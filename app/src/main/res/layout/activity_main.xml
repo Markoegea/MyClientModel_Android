@@ -9,16 +9,21 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-
+        <androidx.appcompat.widget.Toolbar
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/teal_700"
+            app:titleTextColor="@color/white"
+            android:id="@+id/tbActivity"/>
         <fragment
             android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             app:defaultNavHost="true"
             app:navGraph="@navigation/nav_graph"
+            android:layout_below="@id/tbActivity"
+            android:layout_marginBottom="50dp"
             android:id="@+id/fragmentContainerView"/>
-
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -26,7 +31,6 @@
             android:background="?android:attr/windowBackground"
             app:menu="@menu/bottom_nav_menu"
             android:id="@+id/nav_view"/>
-
     </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

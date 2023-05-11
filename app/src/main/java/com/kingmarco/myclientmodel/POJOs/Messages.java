@@ -1,6 +1,6 @@
 package com.kingmarco.myclientmodel.POJOs;
 
-import com.kingmarco.myclientmodel.Auxiliary.MessagesStatus;
+import com.kingmarco.myclientmodel.Auxiliary.Enums.MessagesStatus;
 
 import java.util.Date;
 

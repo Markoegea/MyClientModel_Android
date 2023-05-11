@@ -5,12 +5,16 @@
     android:layout_height="match_parent"
     tools:context=".Fragments.Login.ChangeInfoAccountFragment">
 
-    <ScrollView
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <RelativeLayout
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:id="@+id/svParent">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
                 <!--PersonalLayout!-->
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -122,17 +126,16 @@
                             android:id="@+id/edtPhoneNumber"/>
                     </LinearLayout>
                 </LinearLayout>
-
-                <!--ButtonLayout!-->
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Actualizar"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginTop="30dp"
-                    android:layout_marginBottom="50dp"
-                    android:layout_below="@id/llPersonalInfo"
-                    android:id="@+id/btnUpdate" />
-        </RelativeLayout>
-    </ScrollView>
+            </RelativeLayout>
+        </ScrollView>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_upload"
+            android:backgroundTint="@color/purple_500"
+            android:layout_margin="35dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:id="@+id/btnUpdate"/>
+    </RelativeLayout>
 </FrameLayout>

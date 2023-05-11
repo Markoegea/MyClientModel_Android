@@ -2,7 +2,7 @@ package com.kingmarco.myclientmodel.Fragments.Login;
 
 import android.os.Bundle;
 
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.view.Gravity;
@@ -12,41 +12,54 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.kingmarco.myclientmodel.Auxiliary.InAppSnackBars;
-import com.kingmarco.myclientmodel.Auxiliary.SetLabelName;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.InAppSnackBars;
+import com.kingmarco.myclientmodel.Auxiliary.Enums.SnackBarsInfo;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.DeleteThis;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetFireStoreDB;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
 import com.kingmarco.myclientmodel.POJOs.Clients;
 import com.kingmarco.myclientmodel.R;
 
 /**The Fragment responsible to show and update the not sensitive information of the clien*/
-public class ChangeInfoAccountFragment extends Fragment implements InAppSnackBars {
+public class ChangeInfoAccountFragment extends Fragment implements GetFireStoreDB {
 
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final CollectionReference clientDB = db.collection("Clientes");
     private SetLabelName setLabelName;
+    private ScrollView svParent;
     private Clients client;
-    //Personal View
     private EditText edtDocumentId, edtName, edtLastName, edtAge, edtPhoneNumber;
     private Spinner documentTypeSpinner;
-    private Button btnUpload;
+    private FloatingActionButton btnUpload;
     private View contentView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setLabelName = (SetLabelName) getContext();
-        client = getArguments().getParcelable("client");
+        Bundle data = getArguments();
+        if (data != null){
+            client = getArguments().getParcelable("client");
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         contentView = inflater.inflate(R.layout.fragment_change_info_account, container, false);
-
         setPersonalViews(contentView);
-
+        setEdtData();
+        setListeners();
         setLabelName.setLabelName("Actualizar");
         // Inflate the layout for this fragment
         return contentView;
@@ -54,17 +67,20 @@ public class ChangeInfoAccountFragment extends Fragment implements InAppSnackBar
 
     /**Personal Functions set the views*/
     private void setPersonalViews(View view){
+        svParent = view.findViewById(R.id.svParent);
+
         edtDocumentId = view.findViewById(R.id.edtDocumentId);
+        scrollView(edtDocumentId);
         edtName = view.findViewById(R.id.edtName);
+        scrollView(edtName);
         edtLastName = view.findViewById(R.id.edtLastName);
+        scrollView(edtLastName);
         edtAge = view.findViewById(R.id.edtAge);
+        scrollView(edtAge);
         edtPhoneNumber = view.findViewById(R.id.edtPhoneNumber);
+        scrollView(edtPhoneNumber);
         documentTypeSpinner = view.findViewById(R.id.documentTypeSpinner);
         btnUpload = view.findViewById(R.id.btnUpdate);
-
-        btnUpload.setOnClickListener(this::onUpdateClick);
-
-        setEdtData();
     }
 
     /**Set the information in the edit Text*/
@@ -83,51 +99,75 @@ public class ChangeInfoAccountFragment extends Fragment implements InAppSnackBar
         }
     }
 
-    /**If there is no empty Edit Text update the information*/
-    private void onUpdateClick(View view){
-        if(edtDocumentId.getText().toString().isEmpty() ||
-                edtName.getText().toString().isEmpty() ||
-                edtLastName.getText().toString().isEmpty() ||
-                edtAge.getText().toString().isEmpty()||
-                edtPhoneNumber.getText().toString().isEmpty()){
-            showSnackBar("Hay Campos en Blanco");
-            return;
+    private void scrollView(EditText editText){
+        editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus){
+                    svParent.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            int scrollY = svParent.getScrollY() + view.getHeight();
+                            svParent.scrollTo(0,scrollY);
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    private void setListeners(){
+        btnUpload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!checkData()){
+                    onCompleteFireStoreRequest(SnackBarsInfo.INCOMPLETE_INFO_ERROR);
+                    return;
+                }
+                updateInformation();
+            }
+        });
+    }
+
+    private boolean checkData(){
+        if(edtDocumentId.getText().toString().isEmpty()){
+            return false;
+        } else if (edtName.getText().toString().isEmpty()){
+            return false;
+        }else if (edtLastName.getText().toString().isEmpty()){
+            return false;
+        }else if (edtAge.getText().toString().isEmpty()){
+            return false;
+        }else if (edtPhoneNumber.getText().toString().isEmpty()){
+            return false;
         }
+        return true;
+    }
+
+
+    /**If there is no empty Edit Text update the information*/
+    private void updateInformation(){
         client.setDocumentID(edtDocumentId.getText().toString());
         client.setDocumentType(documentTypeSpinner.getSelectedItem().toString());
         client.setName(edtName.getText().toString());
         client.setLastName(edtLastName.getText().toString());
         client.setAge(Integer.parseInt(edtAge.getText().toString()));
         client.setPhoneNumber(edtPhoneNumber.getText().toString());
-
-        showSnackBar("Tu informacion se ha actulizado correctamente");
-        getActivity().onBackPressed();
+        DocumentReference documentReference = clientDB.document(client.getId());
+        documentReference.set(client).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()){
+                    onCompleteFireStoreRequest(SnackBarsInfo.UPDATE_SUCCESS);
+                } else{
+                    onCompleteFireStoreRequest(SnackBarsInfo.DATA_ERROR);
+                }
+            }
+        });
     }
 
     @Override
-    public void showSnackBar(String text) {
-        Snackbar snackbar = Snackbar.make(contentView,text, Snackbar.LENGTH_SHORT)
-                .setTextColor(getContext().getColor(R.color.white))
-                .setBackgroundTint(getContext().getColor(R.color.black));
-        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbar.getView().getLayoutParams();
-        params.gravity = Gravity.TOP;
-        snackbar.getView().setLayoutParams(params);
-        snackbar.show();
-    }
-
-    @Override
-    public void showSnackBar(String text, int backgroundColor) {
-        Snackbar.make(contentView,text, Snackbar.LENGTH_SHORT)
-                .setTextColor(getContext().getColor(R.color.white))
-                .setBackgroundTint(getContext().getColor(backgroundColor))
-                .show();
-    }
-
-    @Override
-    public void showSnackBar(String text, int backgroundColor, int textColor) {
-        Snackbar.make(contentView,text, Snackbar.LENGTH_SHORT)
-                .setTextColor(getContext().getColor(textColor))
-                .setBackgroundTint(getContext().getColor(backgroundColor))
-                .show();
+    public void onCompleteFireStoreRequest(SnackBarsInfo snackBarsInfo) {
+        InAppSnackBars.defineSnackBarInfo(snackBarsInfo,contentView,getContext(),getActivity(),true);
     }
 }

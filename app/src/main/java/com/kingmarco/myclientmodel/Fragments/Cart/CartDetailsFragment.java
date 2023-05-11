@@ -6,18 +6,15 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.kingmarco.myclientmodel.Adapters.ParcelableAdapter;
-import com.kingmarco.myclientmodel.Auxiliary.SetLabelName;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
 import com.kingmarco.myclientmodel.POJOs.Carts;
 import com.kingmarco.myclientmodel.R;
-
-import java.util.ArrayList;
 
 
 /** The Fragment responsible to show the the detail of the cart*/
@@ -46,7 +43,7 @@ public class CartDetailsFragment extends Fragment {
         parcelableAdapter = new ParcelableAdapter(getActivity(),this);
         parcelableAdapter.setPromoActionId(R.id.action_cartDetailsFragment_to_promotionDetailsFragment);
         parcelableAdapter.setProductActionId(R.id.action_cartDetailsFragment_to_productDetailsFragment);
-        parcelableAdapter.setDatabase(cart.getPurchasedProducts());
+        //parcelableAdapter.setDatabase(cart.getPurchasedProducts());
 
     }
 

@@ -1,4 +1,4 @@
-package com.kingmarco.myclientmodel.Auxiliary;
+package com.kingmarco.myclientmodel.Auxiliary.Enums;
 
 public enum MessagesStatus {
     SENT,

@@ -14,7 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.kingmarco.myclientmodel.Adapters.ParcelableAdapter;
-import com.kingmarco.myclientmodel.Auxiliary.SetLabelName;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
 import com.kingmarco.myclientmodel.POJOs.Promotions;
 import com.kingmarco.myclientmodel.R;
 import com.kingmarco.myclientmodel.Threads.ImageThreads;
@@ -47,7 +47,7 @@ public class PromotionDetailsFragment extends Fragment {
 
         /** Create the parcelable adapter for the products in the purchased product of the promProduct class*/
         ArrayList<Parcelable> productsArrayList = new ArrayList<>();
-        productsArrayList.addAll(promotions.getProducts());
+        //productsArrayList.addAll(promotions.getProducts());
         productsAdapter = new ParcelableAdapter(getActivity(),this);
         productsAdapter.setProductActionId(R.id.action_promotionDetailsFragment_to_productDetailsFragment);
         productsAdapter.setDatabase(productsArrayList);
@@ -65,10 +65,10 @@ public class PromotionDetailsFragment extends Fragment {
         rvPromotedProducts = view.findViewById(R.id.rvPromotedProducts);
 
         /**Organize the information and set the adapter to the recycler view*/
-        new ImageThreads(promotions.getUrl(),ivPromotion,getActivity()).start();
+        /*new ImageThreads(promotions.getUrl(),ivPromotion,getActivity()).start();
         txtPromotionName.setText(promotions.getPromoName());
         txtPromotionDate.setText(promotions.getFinishDate().toString());
-        txtPromotionPrice.setText(promotions.getNewPrice());
+        txtPromotionPrice.setText(promotions.getNewPrice());*/
 
         rvPromotedProducts.setAdapter(productsAdapter);
         rvPromotedProducts.setLayoutManager(new LinearLayoutManager(getContext()));

@@ -1,32 +1,33 @@
 package com.kingmarco.myclientmodel.Fragments.Login;
 
 import android.os.Bundle;
-
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
-import androidx.navigation.fragment.NavHostFragment;
-
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.Toast;
 
-import com.google.android.material.snackbar.Snackbar;
-import com.kingmarco.myclientmodel.Auxiliary.InAppSnackBars;
-import com.kingmarco.myclientmodel.Auxiliary.SetLabelName;
-import com.kingmarco.myclientmodel.POJOs.Clients;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.InAppSnackBars;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncAuthDB;
+import com.kingmarco.myclientmodel.Auxiliary.Enums.SnackBarsInfo;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetAuthDB;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetFireStoreDB;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
 import com.kingmarco.myclientmodel.R;
 
 /**This fragment is the responsible to login the client or send him to the register fragment*/
-public class LoginFragment extends Fragment implements InAppSnackBars {
-    //TODO: IF THE USER LOGIN IN THE APP, CHANGE THE BOTTOM NAVIGATION BAR TO NAVIGATE TO THE CLIENT ACCOUNT FRAGMENT AND NOT HERE
+public class LoginFragment extends Fragment implements GetAuthDB, GetFireStoreDB {
     private SetLabelName setLabelName;
-    private NavController nav;
     private Button btnLogin, btnRegister;
     private EditText edtEmail, edtPassword;
     private View contentView;
@@ -44,79 +45,92 @@ public class LoginFragment extends Fragment implements InAppSnackBars {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         contentView = inflater.inflate(R.layout.fragment_login, container, false);
-        nav = NavHostFragment.findNavController(this);
-
-        btnLogin = contentView.findViewById(R.id.btnLogin);
-        btnLogin.setOnClickListener(this::onClickBtnLogin);
-
-        btnRegister = contentView.findViewById(R.id.btnRegister);
-        btnRegister.setOnClickListener(this::onClickBtnRegister);
-
-        edtEmail = contentView.findViewById(R.id.edtEmail);
-        edtPassword = contentView.findViewById(R.id.edtPassword);
-
+        setViews(contentView);
+        setListeners();
         setLabelName.setLabelName("Iniciar Sesión");
         // Inflate the layout for this fragment
         return contentView;
     }
 
-    /**If all is correct, search for the email in the database, if the password is correct, grant the access*/
-    private void onClickBtnLogin(View view){
-        //Navigate to the login Fragment with the user info
-        if(sanitizeData()){
-            Clients clients = Clients.clients.get(0);
-            if(clients.getEmail().equals(edtEmail.getText().toString()) && clients.getPassword().equals(edtPassword.getText().toString())){
-                Bundle data = new Bundle();
-                data.putParcelable("client",clients);
-                NavController nav = NavHostFragment.findNavController(this);
-                nav.navigate(R.id.action_loginFragment_to_clientAccountFragment,data);
-            }
-        }
+    private void setViews(View view){
+        btnLogin = view.findViewById(R.id.btnLogin);
+        btnRegister = view.findViewById(R.id.btnRegister);
+        edtEmail = view.findViewById(R.id.edtEmail);
+        edtPassword = view.findViewById(R.id.edtPassword);
     }
 
-    private boolean sanitizeData(){
-        if (edtEmail.getText().toString().isEmpty()) {
-            showSnackBar("Falta El Correo.");
+    private void setListeners(){
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String email = edtEmail.getText().toString();
+                String password = edtPassword.getText().toString();
+                if (!sanitizeData(email,password)){
+                    onCompleteFireStoreRequest(SnackBarsInfo.INCOMPLETE_INFO_ERROR);
+                    return;
+                }
+                SyncAuthDB.getInstance().loginClient(email,password,LoginFragment.this,LoginFragment.this);
+            }
+        });
+
+        btnRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NavController navController = NavHostFragment.findNavController(LoginFragment.this);
+                navController.navigate(R.id.action_loginFragment_to_registerClientFragment);
+            }
+        });
+    }
+
+    private boolean sanitizeData(String email, String password){
+        if (email.isEmpty()) {
             edtEmail.requestFocus();
             return false;
-        } else if(edtPassword.getText().toString().isEmpty()){
-            showSnackBar("Falta La Contraseña.");
+        } else if(password.isEmpty()){
             edtPassword.requestFocus();
             return false;
         }
         return true;
     }
 
-    /**Navigate to the register fragment*/
-    private void onClickBtnRegister(View view){
-        //Navigate to the register fragment, with no info
-        nav.navigate(R.id.action_loginFragment_to_registerClientFragment);
+    @Override
+    public void onStart() {
+        super.onStart();
+        onAuthStateChange(FirebaseAuth.getInstance());
     }
 
     @Override
-    public void showSnackBar(String text) {
-        Snackbar snackbar = Snackbar.make(contentView,text, Snackbar.LENGTH_SHORT)
-                .setTextColor(getContext().getColor(R.color.white))
-                .setBackgroundTint(getContext().getColor(R.color.black));
-        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbar.getView().getLayoutParams();
-        params.gravity = Gravity.TOP;
-        snackbar.getView().setLayoutParams(params);
-        snackbar.show();
+    public void onAuthStateChange(@NonNull FirebaseAuth firebaseAuth) {
+        checkDocument(firebaseAuth);
+    }
+
+    private void checkDocument(FirebaseAuth firebaseAuth) {
+        if(!SyncAuthDB.getInstance().isLogin()){return;}
+        String id = firebaseAuth.getCurrentUser().getUid();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("Clientes").document(id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (!SyncAuthDB.getInstance().isLogin()){return;}
+                if (task.isSuccessful()){
+                    if (task.getResult().exists()){
+                        NavController navController = NavHostFragment.findNavController(LoginFragment.this);
+                        navController.navigate(R.id.action_loginFragment_to_clientAccountFragment);
+                        onCompleteFireStoreRequest(SnackBarsInfo.LOGIN_SUCCESS);
+                    } else{
+                        SyncAuthDB.getInstance().logOut();
+                        onCompleteFireStoreRequest(SnackBarsInfo.LOGIN_ERROR);
+                    }
+                } else{
+                    SyncAuthDB.getInstance().logOut();
+                    onCompleteFireStoreRequest(SnackBarsInfo.LOGIN_ERROR);
+                }
+            }
+        });
     }
 
     @Override
-    public void showSnackBar(String text, int backgroundColor) {
-        Snackbar.make(contentView,text, Snackbar.LENGTH_SHORT)
-                .setTextColor(getContext().getColor(R.color.white))
-                .setBackgroundTint(getContext().getColor(backgroundColor))
-                .show();
-    }
-
-    @Override
-    public void showSnackBar(String text, int backgroundColor, int textColor) {
-        Snackbar.make(contentView,text, Snackbar.LENGTH_SHORT)
-                .setTextColor(getContext().getColor(textColor))
-                .setBackgroundTint(getContext().getColor(backgroundColor))
-                .show();
+    public void onCompleteFireStoreRequest(SnackBarsInfo snackBarsInfo) {
+        InAppSnackBars.defineSnackBarInfo(snackBarsInfo,contentView,getContext(),getActivity(),false);
     }
 }

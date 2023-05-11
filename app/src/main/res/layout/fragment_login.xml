@@ -38,32 +38,35 @@
                 android:layout_below="@id/edtEmail"
                 android:inputType="textPassword"
                 android:id="@+id/edtPassword"/>
-            <Button
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Iniciar Sesión"
                 android:layout_below="@id/edtPassword"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="30dp"
-                android:id="@+id/btnLogin"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Ó"
-                android:textSize="30dp"
-                android:textStyle="bold"
-                android:layout_below="@id/btnLogin"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="30dp"
-                android:id="@+id/txt1"/>
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Registrarse"
-                android:layout_below="@id/txt1"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="30dp"
-                android:id="@+id/btnRegister"/>
+                android:layout_marginBottom="50dp">
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Iniciar Sesión"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginEnd="10dp"
+                    android:id="@+id/btnLogin"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ó"
+                    android:textSize="30dp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginEnd="10dp"
+                    android:id="@+id/txt1"/>
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Registrarse"
+                    android:layout_marginTop="30dp"
+                    android:id="@+id/btnRegister"/>
+            </LinearLayout>
         </RelativeLayout>
     </ScrollView>
 </FrameLayout>

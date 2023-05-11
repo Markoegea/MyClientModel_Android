@@ -5,105 +5,130 @@
     android:layout_height="match_parent"
     tools:context=".Fragments.Login.ChangeLoginDataFragment">
 
-    <ScrollView
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <!--LoginLayout!-->
-        <RelativeLayout
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/rlLogin"
-            android:visibility="visible">
+            android:layout_height="wrap_content">
+            <!--LoginLayout!-->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="10dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:visibility="visible"
-                android:id="@+id/llLoginInfo">
-                <RadioGroup
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_margin="20dp"
-                    android:id="@+id/radioLogin">
-                    <RadioButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Cambiar\nCorreo"
-                        android:textSize="20sp"
-                        android:checked="true"
-                        android:layout_margin="10dp"
-                        android:id="@+id/radioEmail"/>
-                    <RadioButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Cambiar\nContraseña"
-                        android:textSize="20sp"
-                        android:layout_margin="10dp"
-                        android:id="@+id/radioPassword"/>
-                </RadioGroup>
-
-                <!--EmailLayout!-->
+                android:id="@+id/rlLogin"
+                android:visibility="visible">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/radioLogin"
                     android:layout_margin="30dp"
                     android:orientation="vertical"
-                    android:visibility="gone"
-                    android:id="@+id/llEmail">
+                    android:id="@+id/llOldLogin">
                     <EditText
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
-                        android:hint="Email"
+                        android:hint="Email Actual"
                         android:layout_marginBottom="20dp"
                         android:inputType="textEmailAddress"
-                        android:id="@+id/edtEmail"/>
+                        android:id="@+id/edtOldEmail"/>
                     <EditText
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
-                        android:hint="Confirmacion Email"
-                        android:inputType="textEmailAddress"
-                        android:id="@+id/edtReEmail"/>
+                        android:hint="Contraseña Actual"
+                        android:inputType="textPassword"
+                        android:id="@+id/edtOldPassword"/>
                 </LinearLayout>
-
-                <!--PasswordLayout!-->
-                <LinearLayout
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/radioLogin"
-                    android:layout_margin="30dp"
                     android:orientation="vertical"
-                    android:visibility="gone"
-                    android:id="@+id/llPassword">
-                    <EditText
+                    android:layout_below="@+id/llOldLogin"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="visible"
+                    android:id="@+id/llLoginInfo">
+                    <RadioGroup
                         android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:hint="Contraseña"
-                        android:layout_marginBottom="20dp"
-                        android:inputType="textPassword"
-                        android:id="@+id/edtPassword"/>
-                    <EditText
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_margin="20dp"
+                        android:id="@+id/radioLogin">
+                        <RadioButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Cambiar\nCorreo"
+                            android:textSize="20sp"
+                            android:checked="true"
+                            android:layout_margin="10dp"
+                            android:id="@+id/radioEmail"/>
+                        <RadioButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Cambiar\nContraseña"
+                            android:textSize="20sp"
+                            android:layout_margin="10dp"
+                            android:id="@+id/radioPassword"/>
+                    </RadioGroup>
+
+                    <!--EmailLayout!-->
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:hint="Confirmacion Contraseña"
-                        android:inputType="textPassword"
-                        android:id="@+id/edtRePassword"/>
-                </LinearLayout>
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/radioLogin"
+                        android:layout_margin="30dp"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        android:id="@+id/llEmail">
+                        <EditText
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:hint="Email"
+                            android:layout_marginBottom="20dp"
+                            android:inputType="textEmailAddress"
+                            android:id="@+id/edtEmail"/>
+                        <EditText
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:hint="Confirmacion Email"
+                            android:inputType="textEmailAddress"
+                            android:id="@+id/edtReEmail"/>
+                    </LinearLayout>
+
+                    <!--PasswordLayout!-->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/radioLogin"
+                        android:layout_margin="30dp"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        android:id="@+id/llPassword">
+                        <EditText
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:hint="Contraseña"
+                            android:layout_marginBottom="20dp"
+                            android:inputType="textPassword"
+                            android:id="@+id/edtPassword"/>
+                        <EditText
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:hint="Confirmacion Contraseña"
+                            android:inputType="textPassword"
+                            android:id="@+id/edtRePassword"/>
+                    </LinearLayout>
+                </RelativeLayout>
             </RelativeLayout>
-            <!--ButtonLayout!-->
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Actualizar"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="30dp"
-                android:layout_marginBottom="50dp"
-                android:layout_below="@id/llLoginInfo"
-                android:id="@+id/btnUpdate" />
-        </RelativeLayout>
-    </ScrollView>
+        </ScrollView>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_upload"
+            android:backgroundTint="@color/purple_500"
+            android:layout_margin="35dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:id="@+id/btnUpdate"/>
+    </RelativeLayout>
 </FrameLayout>

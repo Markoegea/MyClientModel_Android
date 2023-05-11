@@ -6,7 +6,7 @@ import android.os.Bundle;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.view.Gravity;
@@ -21,25 +21,45 @@ import android.widget.Spinner;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.kingmarco.myclientmodel.Auxiliary.InAppSnackBars;
-import com.kingmarco.myclientmodel.Auxiliary.SetLabelName;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.InAppSnackBars;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncAuthDB;
+import com.kingmarco.myclientmodel.Auxiliary.Enums.SnackBarsInfo;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.DeleteThis;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetAuthDB;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetFireStoreDB;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
 import com.kingmarco.myclientmodel.POJOs.Clients;
 import com.kingmarco.myclientmodel.R;
 
-/**This fragment is responsable to let the user register itself in the database*/
-public class RegisterClientFragment extends Fragment implements InAppSnackBars {
+import java.util.UUID;
 
+/**This fragment is responsable to let the user register itself in the database*/
+public class RegisterClientFragment extends Fragment implements GetFireStoreDB, GetAuthDB {
+
+    private final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+    private final FirebaseStorage storage = FirebaseStorage.getInstance();
     private View contentView;
     private SetLabelName setLabelName;
     private ImageView ivClient;
-    private Button btnUploadImage, btnRegister;
+    private FloatingActionButton btnRegister;
+    private Button btnUploadImage;
     private EditText edtEmail, edtPassword, edtRePassword, edtDocumentId, edtName, edtLastName, edtAge, edtPhoneNumber;
     private Spinner documentTypeSpinner;
     private Uri imageUri;
 
     /**Request the image for the storage*/
-    private ActivityResultLauncher<String> getImage = registerForActivityResult(
+    private final ActivityResultLauncher<String> getImage = registerForActivityResult(
             new ActivityResultContracts.GetContent(),
             new ActivityResultCallback<Uri>() {
                 @Override
@@ -68,11 +88,10 @@ public class RegisterClientFragment extends Fragment implements InAppSnackBars {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        this.contentView = inflater.inflate(R.layout.fragment_register_client, container, false);
-
-        setViews(this.contentView);
-
-        setLabelName.setLabelName("Registro");
+        contentView = inflater.inflate(R.layout.fragment_register_client, container, false);
+        setViews(contentView);
+        setListeners();
+        setLabelName.setLabelName("Registrarse");
         // Inflate the layout for this fragment
         return this.contentView;
     }
@@ -94,7 +113,9 @@ public class RegisterClientFragment extends Fragment implements InAppSnackBars {
         edtPhoneNumber = view.findViewById(R.id.edtPhoneNumber);
 
         documentTypeSpinner = view.findViewById(R.id.documentTypeSpinner);
+    }
 
+    private void setListeners(){
         btnUploadImage.setOnClickListener(this::onClickUploadImage);
         btnRegister.setOnClickListener(this::onClickRegisterButton);
     }
@@ -105,92 +126,133 @@ public class RegisterClientFragment extends Fragment implements InAppSnackBars {
 
     /**If all is correct, add the client to the database*/
     private void onClickRegisterButton(View view){
-        if (sanitizeData())
-        {
-            Clients client = new Clients();
-            if(imageUri != null){
-                client.setImageUrl(imageUri.toString());
-            }
-            client.setEmail(edtEmail.getText().toString());
-            client.setPassword(edtPassword.getText().toString());
-            client.setDocumentID(edtDocumentId.getText().toString());
-            client.setDocumentType(documentTypeSpinner.getSelectedItem().toString());
-            client.setName(edtName.getText().toString());
-            client.setLastName(edtLastName.getText().toString());
-            client.setAge(Integer.parseInt(edtAge.getText().toString()));
-            client.setPhoneNumber(edtPhoneNumber.getText().toString());
-            Clients.clients.add(client);
-            showSnackBar("Registro Exitoso");
+        if(SyncAuthDB.getInstance().isLogin()){
+            SyncAuthDB.getInstance().logOut();
             getActivity().onBackPressed();
+            return;
         }
+        if (!sanitizeData()) {
+            onCompleteFireStoreRequest(SnackBarsInfo.INCOMPLETE_INFO_ERROR);
+            return;
+        }
+        if(edtPassword.getText().toString().length()<7){
+            onCompleteFireStoreRequest(SnackBarsInfo.PASSWORD_LENGTH_ERROR);
+            return;
+        }
+        SyncAuthDB.getInstance().registerClient(edtEmail.getText().toString(),
+                edtPassword.getText().toString(),
+                this,
+                this);
     }
 
     /**Sanitize the data*/
     private boolean sanitizeData(){
         if (edtEmail.getText().toString().isEmpty()) {
-            showSnackBar("Se requiere un email.");
             edtEmail.requestFocus();
             return false;
         } else if(edtPassword.getText().toString().isEmpty()){
-            showSnackBar("Falta la contraseña.");
             edtPassword.requestFocus();
             return false;
         }else if(edtRePassword.getText().toString().isEmpty()){
-            showSnackBar("Falta la confirmacion de la contraseña.");
             edtRePassword.requestFocus();
             return false;
         }else if(edtDocumentId.getText().toString().isEmpty()){
-            showSnackBar("Se requiere numero de documento.");
             edtDocumentId.requestFocus();
             return false;
         }else if(edtName.getText().toString().isEmpty()){
-            showSnackBar("Se requiere un nombre.");
             edtName.requestFocus();
             return false;
         }else if(edtLastName.getText().toString().isEmpty()){
-            showSnackBar("Se requiere un apellido.");
             edtLastName.requestFocus();
             return false;
         }else if(edtAge.getText().toString().isEmpty()){
-            showSnackBar("Falta la edad.");
             edtAge.requestFocus();
             return false;
         }else if(edtPhoneNumber.getText().toString().isEmpty()){
-            showSnackBar("Se requiere su numero de telefono.");
             edtPhoneNumber.requestFocus();
             return false;
         } else if(!edtPassword.getText().toString().equals(edtRePassword.getText().toString())){
-            showSnackBar("Las contraseñas no coinciden.");
             edtRePassword.requestFocus();
+            return false;
+        } else if (imageUri == null){
+            ivClient.requestFocus();
             return false;
         }
         return true;
     }
 
     @Override
-    public void showSnackBar(String text) {
-        Snackbar snackbar = Snackbar.make(contentView,text, Snackbar.LENGTH_SHORT)
-                .setTextColor(getContext().getColor(R.color.white))
-                .setBackgroundTint(getContext().getColor(R.color.black));
-        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbar.getView().getLayoutParams();
-        params.gravity = Gravity.TOP;
-        snackbar.getView().setLayoutParams(params);
-        snackbar.show();
+    public void onAuthStateChange(@NonNull FirebaseAuth firebaseAuth) {
+        if(!SyncAuthDB.getInstance().isLogin()){return;}
+        checkDocument();
+    }
+
+    private void checkDocument(){
+        if(firebaseAuth.getCurrentUser() == null){return;}
+        String id = firebaseAuth.getCurrentUser().getUid();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("Clientes").document(id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (!SyncAuthDB.getInstance().isLogin()){return;}
+                if (task.isSuccessful()){
+                    if (!task.getResult().exists()){
+                        addEmployee();
+                    } else{
+                        onCompleteFireStoreRequest(SnackBarsInfo.EXIST_ERROR);
+                    }
+                } else{
+                    onCompleteFireStoreRequest(SnackBarsInfo.DATA_ERROR);
+                }
+            }
+        });
+    }
+
+    private void addEmployee() {
+        if(!SyncAuthDB.getInstance().isLogin()){return;}
+        String clientUID = firebaseAuth.getCurrentUser().getUid();
+        StorageReference clientStorageReference = storage.getReference("Clientes/"+clientUID);
+        int i = UUID.randomUUID().hashCode();
+        StorageReference imageRef = clientStorageReference.child(clientUID+"image_"+i);
+        imageRef.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                if (task.isSuccessful()){
+                    StorageReference storageReference = task.getResult().getStorage();
+                    String imageUrl = storageReference.toString();
+
+                    Clients client = new Clients();
+                    client.setId(clientUID);
+                    client.setImageUrl(imageUrl);
+                    client.setMessagingId(i);
+                    client.setDocumentID(edtDocumentId.getText().toString());
+                    client.setDocumentType(documentTypeSpinner.getSelectedItem().toString());
+                    client.setName(edtName.getText().toString());
+                    client.setLastName(edtLastName.getText().toString());
+                    client.setAge(Integer.parseInt(edtAge.getText().toString()));
+                    client.setPhoneNumber(edtPhoneNumber.getText().toString());
+
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    DocumentReference documentReference = db.collection("Clientes").document(client.getId());
+                    documentReference.set(client).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()){
+                                onCompleteFireStoreRequest(SnackBarsInfo.UPLOAD_SUCCESS);
+                            } else{
+                                onCompleteFireStoreRequest(SnackBarsInfo.DATA_ERROR);
+                            }
+                        }
+                    });
+                } else {
+                    onCompleteFireStoreRequest(SnackBarsInfo.IMAGES_ERROR);
+                }
+            }
+        });
     }
 
     @Override
-    public void showSnackBar(String text, int backgroundColor) {
-        Snackbar.make(contentView,text, Snackbar.LENGTH_SHORT)
-                .setTextColor(getContext().getColor(R.color.white))
-                .setBackgroundTint(getContext().getColor(backgroundColor))
-                .show();
-    }
-
-    @Override
-    public void showSnackBar(String text, int backgroundColor, int textColor) {
-        Snackbar.make(contentView,text, Snackbar.LENGTH_SHORT)
-                .setTextColor(getContext().getColor(textColor))
-                .setBackgroundTint(getContext().getColor(backgroundColor))
-                .show();
+    public void onCompleteFireStoreRequest(SnackBarsInfo snackBarsInfo) {
+        InAppSnackBars.defineSnackBarInfo(snackBarsInfo,contentView,getContext(),getActivity(),true);
     }
 }
