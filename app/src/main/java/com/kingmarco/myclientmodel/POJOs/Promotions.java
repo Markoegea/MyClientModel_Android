@@ -6,16 +6,15 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 
 import com.google.firebase.Timestamp;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.TimestampDeserializer;
 
-import java.text.DecimalFormat;
-import java.time.LocalDate;
 import java.util.ArrayList;
 
 /**The class PromoProduct that is used to organize the information of the PromoProduct and parcel it to other fragments*/
 public class Promotions extends Stock implements Parcelable {
 
     private ArrayList<Long> products;
-    private Timestamp finishDate;
+    private TimestampDeserializer finishDate;
     public static final Creator<Promotions> CREATOR = new Creator<Promotions>() {
         @Override
         public Promotions createFromParcel(Parcel parcel) {
@@ -28,7 +27,7 @@ public class Promotions extends Stock implements Parcelable {
         }
     };
 
-    public Promotions(Long id, String promoName, int newPrice, ArrayList<String>  url, String lastUpdateBy, ArrayList<Long> products, Timestamp finishDate) {
+    public Promotions(Long id, String promoName, int newPrice, ArrayList<String>  url, String lastUpdateBy, ArrayList<Long> products, TimestampDeserializer finishDate) {
         super(id, promoName, newPrice, url, lastUpdateBy);
         this.products = products;
         this.finishDate = finishDate;
@@ -42,7 +41,7 @@ public class Promotions extends Stock implements Parcelable {
         super(in);
         this.products = new ArrayList<>();
         in.readList(this.products, Long.class.getClassLoader());
-        this.finishDate = in.readParcelable(Timestamp.class.getClassLoader());
+        this.finishDate = in.readParcelable(TimestampDeserializer.class.getClassLoader());
     }
 
     @Override
@@ -65,11 +64,11 @@ public class Promotions extends Stock implements Parcelable {
         this.products = products;
     }
 
-    public Timestamp getFinishDate() {
+    public TimestampDeserializer getFinishDate() {
         return finishDate;
     }
 
-    public void setFinishDate(Timestamp finishDate) {
+    public void setFinishDate(TimestampDeserializer finishDate) {
         this.finishDate = finishDate;
     }
 }

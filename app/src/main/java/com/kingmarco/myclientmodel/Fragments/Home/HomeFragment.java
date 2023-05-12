@@ -40,7 +40,7 @@ public class HomeFragment extends Fragment implements ClientObserver {
         super.onCreate(savedInstanceState);
         setLabelName = (SetLabelName) getContext();
         ClientHolder.addObserver(this);
-        stockAdapter = new StockAdapter(getActivity(),this,StockAdapter.VIEW_TYPE_PARCELABLE);
+        stockAdapter = new StockAdapter(getActivity(),this);
         stockAdapter.setActionId(R.id.action_homeFragment_to_productDetailsFragment);
     }
 

@@ -40,7 +40,7 @@ public class CartDetailsFragment extends Fragment {
         cart = getArguments().getParcelable("cart");
         cartName = getArguments().getString("cartName");
 
-        stockAdapter = new StockAdapter(getActivity(),this,StockAdapter.VIEW_TYPE_PARCELABLE);
+        stockAdapter = new StockAdapter(getActivity(),this);
         //parcelableAdapter.setDatabase(cart.getPurchasedProducts());
 
     }

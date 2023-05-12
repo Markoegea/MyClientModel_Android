@@ -20,10 +20,6 @@ public class SyncFireStoreDB {
     public static <T> ListenerRegistration newListenerRegistration(StockAdapter stockAdapter,
                                                                    Class<T> parcelableClass,
                                                                    String collectionPath){
-        if(!SyncAuthDB.getInstance().isLogin()){return null;}
-        if(ClientHolder.getYouClient() == null){
-            return null;
-        }
         ArrayList<Parcelable> allParcelable = new ArrayList<>();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference parcelableDB = db.collection(collectionPath);
@@ -31,7 +27,6 @@ public class SyncFireStoreDB {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                 if (value == null){return;}
-                if(!SyncAuthDB.getInstance().isLogin()){return;}
                 allParcelable.clear();
                 for (DocumentSnapshot document: value.getDocuments()){
                     T parcelable = document.toObject(parcelableClass);

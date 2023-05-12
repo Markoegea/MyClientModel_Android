@@ -5,26 +5,21 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.InAppSnackBars;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.SnackBarsInfo;
-import com.kingmarco.myclientmodel.Auxiliary.Interfaces.DeleteThis;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetFireStoreDB;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
 import com.kingmarco.myclientmodel.POJOs.Clients;

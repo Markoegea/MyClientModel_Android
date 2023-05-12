@@ -10,18 +10,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.firestore.ListenerRegistration;
 import com.kingmarco.myclientmodel.Adapters.StockAdapter;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.ClientHolder;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFireStoreDB;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.ClientObserver;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
+import com.kingmarco.myclientmodel.POJOs.Clients;
+import com.kingmarco.myclientmodel.POJOs.Products;
+import com.kingmarco.myclientmodel.POJOs.Promotions;
 import com.kingmarco.myclientmodel.R;
 
 /**The fragment responsible to show the promotion products in a recycler view*/
-public class PromotionFragment extends Fragment {
+public class PromotionFragment extends Fragment implements ClientObserver {
 
     private SetLabelName setLabelName;
-
     private RecyclerView rvPromProducts;
-
-    private StockAdapter promotionAdapter;
+    private StockAdapter stockAdapter;
+    private ListenerRegistration listenerRegistration;
 
     public PromotionFragment() {
         // Required empty public constructor
@@ -31,11 +37,10 @@ public class PromotionFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setLabelName = (SetLabelName) getContext();
-
+        ClientHolder.addObserver(this);
         /**Set the promotion adapter*/
-        promotionAdapter = new StockAdapter(getActivity(),this,StockAdapter.VIEW_TYPE_PARCELABLE);
-        promotionAdapter.setActionId(R.id.action_promotionFragment_to_promotionDetailsFragment);
-        //promotionAdapter.setDatabase(promoProduct);
+        stockAdapter = new StockAdapter(getActivity(),this);
+        stockAdapter.setActionId(R.id.action_promotionFragment_to_promotionDetailsFragment);
     }
 
     @Override
@@ -43,13 +48,48 @@ public class PromotionFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_promotion, container, false);
 
+        stockAdapter.setContentView(view);
+
         rvPromProducts = view.findViewById(R.id.rvPromProducts);
-        rvPromProducts.setAdapter(promotionAdapter);
+        rvPromProducts.setAdapter(stockAdapter);
         rvPromProducts.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
         setLabelName.setLabelName("Promociones");
 
         // Inflate the layout for this fragment
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        listenerRegistration = SyncFireStoreDB.newListenerRegistration(stockAdapter, Promotions.class,"Promociones");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if(listenerRegistration == null){return;}
+        listenerRegistration.remove();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if(listenerRegistration == null){return;}
+        listenerRegistration.remove();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(listenerRegistration == null){return;}
+        listenerRegistration.remove();
+    }
+
+    @Override
+    public void onVariableChange(Clients client) {
+        if (listenerRegistration != null){return;}
+        listenerRegistration = SyncFireStoreDB.newListenerRegistration(stockAdapter, Promotions.class,"Promociones");
     }
 }
