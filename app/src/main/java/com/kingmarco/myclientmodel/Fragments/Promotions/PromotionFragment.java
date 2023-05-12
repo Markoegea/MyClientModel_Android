@@ -6,20 +6,13 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.kingmarco.myclientmodel.Adapters.ParcelableAdapter;
+import com.kingmarco.myclientmodel.Adapters.StockAdapter;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
-import com.kingmarco.myclientmodel.POJOs.Products;
-import com.kingmarco.myclientmodel.POJOs.Promotions;
 import com.kingmarco.myclientmodel.R;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 /**The fragment responsible to show the promotion products in a recycler view*/
 public class PromotionFragment extends Fragment {
@@ -28,7 +21,7 @@ public class PromotionFragment extends Fragment {
 
     private RecyclerView rvPromProducts;
 
-    private ParcelableAdapter promotionAdapter;
+    private StockAdapter promotionAdapter;
 
     public PromotionFragment() {
         // Required empty public constructor
@@ -40,8 +33,8 @@ public class PromotionFragment extends Fragment {
         setLabelName = (SetLabelName) getContext();
 
         /**Set the promotion adapter*/
-        promotionAdapter = new ParcelableAdapter(getActivity(),this);
-        promotionAdapter.setPromoActionId(R.id.action_promotionFragment_to_promotionDetailsFragment);
+        promotionAdapter = new StockAdapter(getActivity(),this,StockAdapter.VIEW_TYPE_PARCELABLE);
+        promotionAdapter.setActionId(R.id.action_promotionFragment_to_promotionDetailsFragment);
         //promotionAdapter.setDatabase(promoProduct);
     }
 

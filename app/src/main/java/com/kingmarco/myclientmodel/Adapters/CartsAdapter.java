@@ -20,7 +20,6 @@ import com.kingmarco.myclientmodel.POJOs.Carts;
 import com.kingmarco.myclientmodel.POJOs.Products;
 import com.kingmarco.myclientmodel.POJOs.Promotions;
 import com.kingmarco.myclientmodel.R;
-import com.kingmarco.myclientmodel.Threads.ImageThreads;
 
 import java.util.ArrayList;
 
@@ -108,7 +107,7 @@ public class CartsAdapter extends RecyclerView.Adapter<CartsAdapter.ViewHolder>{
         name.append(cartProduct.getName()+", ");
 
         if(cartProduct.getUrl().get(0) == null || hasImage){return false;}
-        new ImageThreads(cartProduct.getUrl().get(0),holder.ivCart,fragmentActivity).start();
+        //new ImageThreads(cartProduct.getUrl().get(0),holder.ivCart,fragmentActivity).start();
         return true;
     }
 

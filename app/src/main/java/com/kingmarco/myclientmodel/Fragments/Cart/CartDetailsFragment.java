@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.kingmarco.myclientmodel.Adapters.ParcelableAdapter;
+import com.kingmarco.myclientmodel.Adapters.StockAdapter;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
 import com.kingmarco.myclientmodel.POJOs.Carts;
 import com.kingmarco.myclientmodel.R;
@@ -26,7 +26,7 @@ public class CartDetailsFragment extends Fragment {
             ,txtCartPrice,txtCartDirection;
     private RecyclerView rvCartProducts;
     private String cartName;
-    private ParcelableAdapter parcelableAdapter;
+    private StockAdapter stockAdapter;
 
     public CartDetailsFragment() {
         // Required empty public constructor
@@ -40,9 +40,7 @@ public class CartDetailsFragment extends Fragment {
         cart = getArguments().getParcelable("cart");
         cartName = getArguments().getString("cartName");
 
-        parcelableAdapter = new ParcelableAdapter(getActivity(),this);
-        parcelableAdapter.setPromoActionId(R.id.action_cartDetailsFragment_to_promotionDetailsFragment);
-        parcelableAdapter.setProductActionId(R.id.action_cartDetailsFragment_to_productDetailsFragment);
+        stockAdapter = new StockAdapter(getActivity(),this,StockAdapter.VIEW_TYPE_PARCELABLE);
         //parcelableAdapter.setDatabase(cart.getPurchasedProducts());
 
     }
@@ -85,7 +83,7 @@ public class CartDetailsFragment extends Fragment {
         txtCartPrice.setText(String.valueOf(cart.getPrice()));
         txtCartDirection.setText(cart.getDirection());
 
-        rvCartProducts.setAdapter(parcelableAdapter);
+        rvCartProducts.setAdapter(stockAdapter);
         rvCartProducts.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 }

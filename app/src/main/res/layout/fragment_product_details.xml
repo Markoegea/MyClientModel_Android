@@ -33,13 +33,17 @@
                android:layout_marginStart="20dp"
                android:layout_marginEnd="20dp"
                android:id="@+id/txtProductCategory"/>
+
            <androidx.viewpager.widget.ViewPager
-               android:layout_width="match_parent"
-               android:layout_height="250dp"
-               android:layout_centerHorizontal="true"
+               android:id="@+id/vpImagesProduct"
+               android:layout_width="400dp"
+               android:layout_height="400dp"
                android:layout_below="@id/txtProductCategory"
-               android:layout_margin="20dp"
-               android:id="@+id/vpImagesProduct"/>
+               android:layout_centerHorizontal="true"
+               android:layout_marginStart="20dp"
+               android:layout_marginTop="20dp"
+               android:layout_marginEnd="20dp"
+               android:layout_marginBottom="20dp" />
            <TextView
                android:layout_width="wrap_content"
                android:layout_height="wrap_content"

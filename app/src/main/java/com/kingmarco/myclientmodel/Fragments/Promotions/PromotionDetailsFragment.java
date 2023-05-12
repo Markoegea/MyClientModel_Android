@@ -13,11 +13,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.kingmarco.myclientmodel.Adapters.ParcelableAdapter;
+import com.kingmarco.myclientmodel.Adapters.StockAdapter;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
 import com.kingmarco.myclientmodel.POJOs.Promotions;
 import com.kingmarco.myclientmodel.R;
-import com.kingmarco.myclientmodel.Threads.ImageThreads;
 
 import java.util.ArrayList;
 
@@ -30,7 +29,7 @@ public class PromotionDetailsFragment extends Fragment {
     private TextView txtPromotionName, txtPromotionDate, txtPromotionPrice;
     private RecyclerView rvPromotedProducts;
     private Promotions promotions;
-    private ParcelableAdapter productsAdapter;
+    private StockAdapter productsAdapter;
 
 
     public PromotionDetailsFragment() {
@@ -48,8 +47,8 @@ public class PromotionDetailsFragment extends Fragment {
         /** Create the parcelable adapter for the products in the purchased product of the promProduct class*/
         ArrayList<Parcelable> productsArrayList = new ArrayList<>();
         //productsArrayList.addAll(promotions.getProducts());
-        productsAdapter = new ParcelableAdapter(getActivity(),this);
-        productsAdapter.setProductActionId(R.id.action_promotionDetailsFragment_to_productDetailsFragment);
+        productsAdapter = new StockAdapter(getActivity(),this,StockAdapter.VIEW_TYPE_PROMOTED);
+        productsAdapter.setActionId(R.id.action_promotionDetailsFragment_to_productDetailsFragment);
         productsAdapter.setDatabase(productsArrayList);
 
     }
