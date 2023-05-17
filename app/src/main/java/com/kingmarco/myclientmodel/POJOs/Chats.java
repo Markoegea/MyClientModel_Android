@@ -5,7 +5,7 @@ import java.util.Date;
 
 /**The class Messages that is used to organize the information of the Message and show it the chat fragment*/
 public class Chats {
-    private Long clientID;
+    private Integer clientID;
     private String image;
     private String name;
     private Messages lastMessage;
@@ -13,23 +13,24 @@ public class Chats {
     public Chats() {
     }
 
-    public Chats(String image, String name) {
+    public Chats(Integer clientID, String image, String name) {
+        this.clientID = clientID;
         this.image = image;
         this.name = name;
     }
 
-    public Chats(Long clientID, String image, String name, Messages lastMessage) {
+    public Chats(Integer clientID, String image, String name, Messages lastMessage) {
         this.clientID = clientID;
         this.image = image;
         this.name = name;
         this.lastMessage = lastMessage;
     }
 
-    public Long getClientID() {
+    public Integer getClientID() {
         return clientID;
     }
 
-    public void setClientID(Long clientID) {
+    public void setClientID(Integer clientID) {
         this.clientID = clientID;
     }
 

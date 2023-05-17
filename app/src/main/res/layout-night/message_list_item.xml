@@ -29,8 +29,8 @@
                 android:text="Time"
                 android:textSize="12sp"
                 android:textColor="@color/white_gray"
-                android:textIsSelectable="true"
                 android:layout_below="@+id/txtMessageText"
+                android:textIsSelectable="true"
                 android:layout_marginTop="5dp"
                 android:layout_marginEnd="10dp"
                 android:layout_marginStart="10dp"
@@ -41,7 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/rlMessage"
             android:visibility="gone"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:text="STATUS"
             android:textIsSelectable="true"
             android:id="@+id/txtStatus"/>

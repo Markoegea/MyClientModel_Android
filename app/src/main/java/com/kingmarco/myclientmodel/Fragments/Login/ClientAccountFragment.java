@@ -32,10 +32,12 @@ import com.kingmarco.myclientmodel.Auxiliary.Classes.ClientHolder;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.GlideApp;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.InAppSnackBars;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncAuthDB;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncRealtimeDB;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.SnackBarsInfo;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.ClientObserver;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetFireStoreDB;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
+import com.kingmarco.myclientmodel.POJOs.Chats;
 import com.kingmarco.myclientmodel.POJOs.Clients;
 import com.kingmarco.myclientmodel.R;
 
@@ -166,8 +168,8 @@ public class ClientAccountFragment extends Fragment implements ClientObserver, G
 
     private void uploadImage(Clients client, Uri uri) {
         StorageReference clientStorageReference = storage.getReference("Clientes/"+client.getId());
-        String i = UUID.randomUUID().toString();
-        StorageReference imageRef = clientStorageReference.child(client.getId()+"image_"+i);
+        int i = UUID.randomUUID().hashCode();
+        StorageReference imageRef = clientStorageReference.child("image_"+i);
         imageRef.putFile(uri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
@@ -181,6 +183,8 @@ public class ClientAccountFragment extends Fragment implements ClientObserver, G
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()){
+                                SyncRealtimeDB syncRealtimeDB = SyncRealtimeDB.getInstance();
+                                syncRealtimeDB.uploadChat(imageUrl,"image");
                                 onCompleteFireStoreRequest(SnackBarsInfo.UPDATE_SUCCESS);
                             } else{
                                 onCompleteFireStoreRequest(SnackBarsInfo.DATA_ERROR);

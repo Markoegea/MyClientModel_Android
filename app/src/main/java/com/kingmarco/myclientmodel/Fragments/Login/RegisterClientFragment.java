@@ -209,7 +209,7 @@ public class RegisterClientFragment extends Fragment implements GetFireStoreDB, 
         String clientUID = firebaseAuth.getCurrentUser().getUid();
         StorageReference clientStorageReference = storage.getReference("Clientes/"+clientUID);
         int i = UUID.randomUUID().hashCode();
-        StorageReference imageRef = clientStorageReference.child(clientUID+"image_"+i);
+        StorageReference imageRef = clientStorageReference.child("image_"+i);
         imageRef.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {

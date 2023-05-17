@@ -5,32 +5,58 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.fragment.NavHostFragment;
 
+import android.Manifest;
+import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.RemoteViews;
 
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.NotificationTarget;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.ClientHolder;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.GlideApp;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncAuthDB;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncRealtimeDB;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.ClientObserver;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetAuthDB;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.NotificationTemplate;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
+import com.kingmarco.myclientmodel.POJOs.Chats;
 import com.kingmarco.myclientmodel.POJOs.Clients;
 import com.kingmarco.myclientmodel.R;
 
 import org.checkerframework.checker.units.qual.C;
 
-public class MainActivity extends AppCompatActivity implements SetLabelName, GetAuthDB, ClientObserver {
+public class MainActivity extends AppCompatActivity implements SetLabelName, GetAuthDB, ClientObserver
+        , NotificationTemplate {
 
     public final int NAVIGATION_DISABLE = 0;
     public final int NAVIGATION_ENABLE = 1;
@@ -41,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements SetLabelName, Get
     private BottomNavigationView bottomNavigationView;
     private Toolbar tbActivity;
     private NavController navController;
+    private SyncRealtimeDB syncRealtimeDB;
 
     /**The Main Class, that control the bottom navigation bar, how it works to navigate to other fragments
        The label name of the fragments, and the what happens when the back button is pressed*/
@@ -51,7 +78,12 @@ public class MainActivity extends AppCompatActivity implements SetLabelName, Get
 
         ClientHolder.addObserver(this);
 
+        createNotificationChannel();
+        checkNotificationPermission();
+
         SyncAuthDB.getInstance().addListenerAuth(this);
+
+        syncRealtimeDB = SyncRealtimeDB.getInstance();
 
         bottomNavigationView = findViewById(R.id.nav_view);
         tbActivity = findViewById(R.id.tbActivity);
@@ -133,6 +165,126 @@ public class MainActivity extends AppCompatActivity implements SetLabelName, Get
         }
     }
 
+    @Override
+    public void createNotificationChannel() {
+        NotificationManager notificationManager = getSystemService(NotificationManager.class);
+        //Channel HIGH
+        CharSequence name = getString(R.string.summary_channel_name);
+        String description = "All Notification Channel For Messages";
+        int importance = NotificationManager.IMPORTANCE_HIGH;
+        NotificationChannel highChannel = new NotificationChannel(CHANNEL_HIGH, name, importance);
+        highChannel.setDescription(description);
+        notificationManager.createNotificationChannel(highChannel);
+        //Channel LOW
+        name = getString(R.string.message_channel_name);
+        description = "Unique Notification Channel For Messages";
+        importance = NotificationManager.IMPORTANCE_LOW;
+        NotificationChannel lowChannel = new NotificationChannel(CHANNEL_LOW, name, importance);
+        lowChannel.setDescription(description);
+        notificationManager.createNotificationChannel(lowChannel);
+    }
+
+    @Override
+    public void checkNotificationPermission() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Permiso de Notificacion Requerido")
+                    .setMessage("Puedes enterarte de los nuevos mensajes" +
+                            "incluso si tienes la aplicacion cerrada")
+                    .setPositiveButton("Okey", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                    Uri.fromParts("package",MainActivity.this.getPackageName(), null));
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                        }
+                    })
+                    .setNegativeButton("No quiero",null)
+                    .create()
+                    .show();
+        }
+    }
+
+    @Override
+    public void createMessageSummary() {
+        Notification summaryNotification = new NotificationCompat.Builder(this, CHANNEL_LOW)
+                .setSmallIcon(R.drawable.ic_person)
+                .setContentTitle("Hola")
+                .setContentText("No tienes ningun mensaje pendiente")
+                .setVibrate(new long[]{1000,1000})
+                .setGroup(GROUP_KEY_MESSAGES)
+                .setGroupSummary(true)
+                .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
+                .build();
+
+        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED){
+            notificationManagerCompat.notify(SUMMARY_ID, summaryNotification);
+        }
+    }
+
+    @Override
+    public void newMessagesNotification(String title, String text, int clientID, String imageUrl) {
+        RemoteViews notificationLayoutBig = new RemoteViews(getPackageName(), R.layout.big_custom_notification);
+        notificationLayoutBig.setTextViewText(R.id.notification_title, title);
+        notificationLayoutBig.setTextViewText(R.id.notification_text, text);
+        ViewGroup tempContainerBig = new FrameLayout(this);
+        LayoutInflater layoutInflaterBig = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View temViewBig = layoutInflaterBig.inflate(notificationLayoutBig.getLayoutId(), tempContainerBig,false);
+        notificationLayoutBig.reapply(this,temViewBig);
+
+        RemoteViews notificationLayoutSmall = new RemoteViews(getPackageName(), R.layout.small_custom_notification);
+        notificationLayoutSmall.setTextViewText(R.id.notification_title, title);
+        notificationLayoutSmall.setTextViewText(R.id.notification_text, text);
+        ViewGroup tempContainerSmall = new FrameLayout(this);
+        LayoutInflater layoutInflaterSmall = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View temViewSmall = layoutInflaterSmall.inflate(notificationLayoutBig.getLayoutId(), tempContainerSmall,false);
+        notificationLayoutSmall.reapply(this,temViewSmall);
+
+        Intent intent = new Intent(this,MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                .putExtra("navigateTo",R.id.chatFragment);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, clientID,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_HIGH)
+                .setSmallIcon(R.drawable.ic_person)
+                .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
+                .setCustomContentView(notificationLayoutSmall)
+                .setCustomBigContentView(notificationLayoutBig)
+                .setGroup(GROUP_KEY_MESSAGES)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true);
+
+
+        Notification notification = builder.build();
+
+        NotificationTarget notificationTarget = new NotificationTarget(
+                this,
+                R.id.notification_icon,
+                notificationLayoutBig,
+                notification,
+                clientID);
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference gsReference = storage.getReferenceFromUrl(imageUrl);
+        GlideApp.with(this)
+                .asBitmap()
+                .load(gsReference)
+                .apply(RequestOptions.circleCropTransform())
+                .into(notificationTarget);
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED){
+            notificationManager.notify(clientID, notification);
+        }
+    }
+
+    @Override
+    public void deleteMessagesNotification(int clientID) {
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(clientID);
+    }
+
     /**Return to the previous fragment, erasing the actual fragment ot the stack*/
     private boolean clearPopBackStack(){
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -141,6 +293,21 @@ public class MainActivity extends AppCompatActivity implements SetLabelName, Get
             return true;
         }
         return false;
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        onNotificationOpen(intent);
+    }
+
+    private void onNotificationOpen(Intent intent){
+        if (intent == null){return;}
+        int navigateTo = intent.getIntExtra("navigateTo",0);
+        if (navigateTo == 0) {
+            return;
+        }
+        navController.navigate(navigateTo);
     }
 
     /**Calling when use back button of the app*/
@@ -173,13 +340,20 @@ public class MainActivity extends AppCompatActivity implements SetLabelName, Get
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        syncRealtimeDB.stopListening();
         SyncAuthDB.getInstance().removeListenerClient();
         SyncAuthDB.getInstance().removeListenerAuth(this);
     }
 
     @Override
     public void onVariableChange(Clients client) {
-        if (client == null){return;}
+        if (client == null){
+            syncRealtimeDB.stopListening();
+            return;
+        }
+        syncRealtimeDB.listening(FirebaseDatabase.getInstance()
+                .getReference("chats/"+client.getMessagingId()),this);
+        syncRealtimeDB.startListening();
     }
 
     @Override
@@ -188,6 +362,7 @@ public class MainActivity extends AppCompatActivity implements SetLabelName, Get
             SyncAuthDB.getInstance().addListenerClient();
         }else{
             SyncAuthDB.getInstance().removeListenerClient();
+            syncRealtimeDB.stopListening();
         }
     }
 }
