@@ -76,12 +76,8 @@ public class MainActivity extends AppCompatActivity implements SetLabelName, Get
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ClientHolder.addObserver(this);
-
         createNotificationChannel();
         checkNotificationPermission();
-
-        SyncAuthDB.getInstance().addListenerAuth(this);
 
         syncRealtimeDB = SyncRealtimeDB.getInstance();
 
@@ -338,9 +334,17 @@ public class MainActivity extends AppCompatActivity implements SetLabelName, Get
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        ClientHolder.addObserver(this);
+        SyncAuthDB.getInstance().addListenerAuth(this);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         syncRealtimeDB.stopListening();
+        ClientHolder.removeObserver(this);
         SyncAuthDB.getInstance().removeListenerClient();
         SyncAuthDB.getInstance().removeListenerAuth(this);
     }

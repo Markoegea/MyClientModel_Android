@@ -16,8 +16,6 @@ import com.kingmarco.myclientmodel.POJOs.Clients;
 import com.kingmarco.myclientmodel.POJOs.Messages;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class SyncRealtimeDB {
     private static SyncRealtimeDB sharedInstance;
@@ -125,10 +123,6 @@ public class SyncRealtimeDB {
         for (GetRealtimeDB observer: observers){
             observer.getSyncRealtimeDB(snackBarsInfo);
         }
-    }
-
-    public Chats getMyChat(){
-        return myChat;
     }
 
     public void uploadChat(String information, String field){

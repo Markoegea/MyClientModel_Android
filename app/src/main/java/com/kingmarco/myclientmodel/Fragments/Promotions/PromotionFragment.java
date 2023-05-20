@@ -37,7 +37,6 @@ public class PromotionFragment extends Fragment implements ClientObserver {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setLabelName = (SetLabelName) getContext();
-        ClientHolder.addObserver(this);
         /**Set the promotion adapter*/
         stockAdapter = new StockAdapter(getActivity(),this);
         stockAdapter.setActionId(R.id.action_promotionFragment_to_promotionDetailsFragment);
@@ -61,6 +60,12 @@ public class PromotionFragment extends Fragment implements ClientObserver {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        ClientHolder.addObserver(this);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         listenerRegistration = SyncFireStoreDB.newListenerRegistration(stockAdapter, Promotions.class,"Promociones");
@@ -76,6 +81,7 @@ public class PromotionFragment extends Fragment implements ClientObserver {
     @Override
     public void onStop() {
         super.onStop();
+        ClientHolder.removeObserver(this);
         if(listenerRegistration == null){return;}
         listenerRegistration.remove();
     }
@@ -83,6 +89,7 @@ public class PromotionFragment extends Fragment implements ClientObserver {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        ClientHolder.removeObserver(this);
         if(listenerRegistration == null){return;}
         listenerRegistration.remove();
     }

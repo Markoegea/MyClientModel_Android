@@ -39,7 +39,6 @@ public class HomeFragment extends Fragment implements ClientObserver {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setLabelName = (SetLabelName) getContext();
-        ClientHolder.addObserver(this);
         stockAdapter = new StockAdapter(getActivity(),this);
         stockAdapter.setActionId(R.id.action_homeFragment_to_productDetailsFragment);
     }
@@ -62,6 +61,12 @@ public class HomeFragment extends Fragment implements ClientObserver {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        ClientHolder.addObserver(this);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         listenerRegistration = SyncFireStoreDB.newListenerRegistration(stockAdapter, Products.class,"Productos");
@@ -77,13 +82,16 @@ public class HomeFragment extends Fragment implements ClientObserver {
     @Override
     public void onStop() {
         super.onStop();
+        ClientHolder.removeObserver(this);
         if(listenerRegistration == null){return;}
         listenerRegistration.remove();
     }
 
+
     @Override
     public void onDestroy() {
         super.onDestroy();
+        ClientHolder.removeObserver(this);
         if(listenerRegistration == null){return;}
         listenerRegistration.remove();
     }

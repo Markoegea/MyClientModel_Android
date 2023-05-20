@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -80,7 +81,6 @@ public class ClientAccountFragment extends Fragment implements ClientObserver, G
         contentView = inflater.inflate(R.layout.fragment_client_account, container, false);
         setViews(contentView);
         withAClient();
-        ClientHolder.addObserver(this);
         setLabelName.setLabelName("Cuenta");
         // Inflate the layout for this fragment
         return contentView;
@@ -98,7 +98,6 @@ public class ClientAccountFragment extends Fragment implements ClientObserver, G
 
     @Override
     public void onVariableChange(Clients client) {
-        System.out.println(client);
         if(client == null){return;}
         this.client = client;
         if (client.getImageUrl() != null){
@@ -152,6 +151,24 @@ public class ClientAccountFragment extends Fragment implements ClientObserver, G
                 onLogOut();
             }
         });
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        ClientHolder.addObserver(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        ClientHolder.removeObserver(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ClientHolder.removeObserver(this);
     }
 
     private void getImage(Uri uri){
