@@ -6,79 +6,48 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 
 import com.google.firebase.Timestamp;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.TimestampDeserializer;
+import com.kingmarco.myclientmodel.Auxiliary.Enums.CartStatus;
+import com.kingmarco.myclientmodel.Auxiliary.Enums.StockType;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
-/**The class cart that is used to organize the information of the cart and parcel it to pass to others fragments*/
-public class Carts implements Parcelable {
+/**The class cart that is used to organize the information of the cart*/
+public class Carts {
 
     private Long id;
-    private ArrayList<String> purchasedProducts;
-    private Long buyerClient;
-    private String owner;
-    private int price;
-    private String status;
-    private String direction;
-    private Timestamp purchasedDate;
-    private Timestamp arrivedDate;
+    private Map<String,ArrayList<Long>> purchasedItemsId;
+    private String clientId;
+    private int totalPrice;
+    private CartStatus status;
+    private TimestampDeserializer purchasedDate;
+    private TimestampDeserializer arrivedDate;
     private String lastUpdateBy;
+    public Carts() {
+    }
 
-    public static final Creator<Carts> CREATOR = new Creator<>() {
-        @Override
-        public Carts createFromParcel(Parcel parcel) {
-            return new Carts(parcel);
-        }
-
-        @Override
-        public Carts[] newArray(int i) {
-            return new Carts[0];
-        }
-    };
-
-    public Carts(Long id,ArrayList<String> purchasedProducts, Long buyerClient, String owner, int price, String status, String direction, Timestamp purchasedDate, Timestamp arrivedDate) {
-        this.id = id;
-        this.purchasedProducts = purchasedProducts;
-        this.buyerClient = buyerClient;
-        this.owner = owner;
-        this.price = price;
+    public Carts(CartStatus status) {
         this.status = status;
-        this.direction = direction;
+        this.purchasedItemsId = new HashMap<>();
+
+    }
+
+    public Carts(Long id,
+                 Map<String, ArrayList<Long>> purchasedItemsId,
+                 String clientID,
+                 int totalPrice,
+                 CartStatus status,
+                 TimestampDeserializer purchasedDate,
+                 TimestampDeserializer arrivedDate) {
+        this.id = id;
+        this.purchasedItemsId = purchasedItemsId;
+        this.clientId = clientID;
+        this.totalPrice = totalPrice;
+        this.status = status;
         this.purchasedDate = purchasedDate;
         this.arrivedDate = arrivedDate;
-    }
-
-    protected Carts(Parcel in){
-        this.id = in.readLong();
-        in.readList(this.purchasedProducts, String.class.getClassLoader());
-        this.buyerClient = in.readLong();
-        this.owner = in.readString();
-        this.price = in.readInt();
-        this.status = in.readString();
-        this.direction = in.readString();
-        this.purchasedDate = in.readParcelable(Timestamp.class.getClassLoader());
-        this.arrivedDate = in.readParcelable(Timestamp.class.getClassLoader());
-        this.lastUpdateBy = in.readString();
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(@NonNull Parcel parcel, int i) {
-        parcel.writeLong(this.id);
-        parcel.writeList(this.purchasedProducts);
-        parcel.writeLong(this.buyerClient);
-        parcel.writeString(this.owner);
-        parcel.writeInt(this.price);
-        parcel.writeString(this.status);
-        parcel.writeString(this.direction);
-        this.purchasedDate.writeToParcel(parcel, i);
-        this.arrivedDate.writeToParcel(parcel, i);
-        parcel.writeString(this.lastUpdateBy);
     }
 
 
@@ -90,67 +59,51 @@ public class Carts implements Parcelable {
         this.id = id;
     }
 
-    public ArrayList<String> getPurchasedProducts() {
-        return purchasedProducts;
+    public Map<String, ArrayList<Long>> getPurchasedItemsId() {
+        return purchasedItemsId;
     }
 
-    public void setPurchasedProducts(ArrayList<String> purchasedProducts) {
-        this.purchasedProducts = purchasedProducts;
+    public void setPurchasedItemsId(Map<String, ArrayList<Long>> purchasedItemsId) {
+        this.purchasedItemsId = purchasedItemsId;
     }
 
-    public Long getBuyerClient() {
-        return buyerClient;
+    public String getClientId() {
+        return clientId;
     }
 
-    public void setBuyerClient(Long buyerClient) {
-        this.buyerClient = buyerClient;
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
     }
 
-    public String getOwner() {
-        return owner;
+    public int getTotalPrice() {
+        return totalPrice;
     }
 
-    public void setOwner(String owner) {
-        this.owner = owner;
+    public void setTotalPrice(int totalPrice) {
+        this.totalPrice = totalPrice;
     }
 
-    public int getPrice() {
-        return price;
-    }
-
-    public void setPrice(int price) {
-        this.price = price;
-    }
-
-    public String getStatus() {
+    public CartStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(CartStatus status) {
         this.status = status;
     }
 
-    public String getDirection() {
-        return direction;
-    }
-
-    public void setDirection(String direction) {
-        this.direction = direction;
-    }
-
-    public Timestamp getPurchasedDate() {
+    public TimestampDeserializer getPurchasedDate() {
         return purchasedDate;
     }
 
-    public void setPurchasedDate(Timestamp purchasedDate) {
+    public void setPurchasedDate(TimestampDeserializer purchasedDate) {
         this.purchasedDate = purchasedDate;
     }
 
-    public Timestamp getArrivedDate() {
+    public TimestampDeserializer getArrivedDate() {
         return arrivedDate;
     }
 
-    public void setArrivedDate(Timestamp arrivedDate) {
+    public void setArrivedDate(TimestampDeserializer arrivedDate) {
         this.arrivedDate = arrivedDate;
     }
 

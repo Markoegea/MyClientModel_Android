@@ -6,30 +6,23 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.firebase.firestore.ListenerRegistration;
 import com.kingmarco.myclientmodel.Adapters.StockAdapter;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.ClientHolder;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFireStoreDB;
-import com.kingmarco.myclientmodel.Auxiliary.Interfaces.ClientObserver;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.StockHolder;
+import com.kingmarco.myclientmodel.Auxiliary.Enums.StockType;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
-import com.kingmarco.myclientmodel.POJOs.Clients;
-import com.kingmarco.myclientmodel.POJOs.Products;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.StockObserver;
 import com.kingmarco.myclientmodel.R;
 
-import java.util.ArrayList;
-
 /** The fragment responsible for show the recycler with the products*/
-public class HomeFragment extends Fragment implements ClientObserver {
+public class HomeFragment extends Fragment implements StockObserver {
 
     private SetLabelName setLabelName;
     private RecyclerView rvProducts;
     private StockAdapter stockAdapter;
-    private ListenerRegistration listenerRegistration;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -41,6 +34,7 @@ public class HomeFragment extends Fragment implements ClientObserver {
         setLabelName = (SetLabelName) getContext();
         stockAdapter = new StockAdapter(getActivity(),this);
         stockAdapter.setActionId(R.id.action_homeFragment_to_productDetailsFragment);
+        onVariableChange();
     }
 
 
@@ -61,44 +55,25 @@ public class HomeFragment extends Fragment implements ClientObserver {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        ClientHolder.addObserver(this);
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
-        listenerRegistration = SyncFireStoreDB.newListenerRegistration(stockAdapter, Products.class,"Productos");
+        StockHolder.addObserver(this);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        if(listenerRegistration == null){return;}
-        listenerRegistration.remove();
+        StockHolder.removeObserver(this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        ClientHolder.removeObserver(this);
-        if(listenerRegistration == null){return;}
-        listenerRegistration.remove();
-    }
-
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        ClientHolder.removeObserver(this);
-        if(listenerRegistration == null){return;}
-        listenerRegistration.remove();
+        StockHolder.removeObserver(this);
     }
 
     @Override
-    public void onVariableChange(Clients client) {
-        if (listenerRegistration != null){return;}
-        listenerRegistration = SyncFireStoreDB.newListenerRegistration(stockAdapter,Products.class,"Productos");
+    public void onVariableChange() {
+        stockAdapter.setDatabase(StockHolder.getList(StockType.PRODUCT));
     }
 }

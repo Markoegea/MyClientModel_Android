@@ -38,7 +38,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Productos"
-                    android:textSize="20sp"
+                    android:textSize="25sp"
+                    android:textStyle="italic"
                     android:fontFamily="sans-serif-medium"
                     android:layout_marginTop="13dp"
                     android:layout_marginStart="20dp"
@@ -52,54 +53,30 @@
                     android:layout_marginTop="20dp"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"
-                    android:visibility="gone"
-                    android:id="@+id/ll1">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Llegó el:"
-                        android:textSize="23sp"
-                        android:textStyle="italic"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="1/04/2023"
-                        android:textColor="@color/red"
-                        android:textSize="25sp"
-                        android:textStyle="bold"
-                        android:layout_marginStart="10dp"
-                        android:id="@+id/txtArriveDate"/>
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/ll1"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"
                     android:id="@+id/ll2">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Lo compraste el:"
+                        android:text="Info:"
                         android:textSize="23sp"
-                        android:textStyle="italic"/>
+                        android:textStyle="italic"
+                        android:id="@+id/txtCartDateType"/>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="1/03/2023"
-                        android:textColor="@color/red"
+                        android:text="XX/XX/XXXX"
+                        android:textColor="@color/blue"
                         android:textSize="25sp"
                         android:textStyle="bold"
                         android:layout_marginStart="10dp"
-                        android:id="@+id/txtPurchaseDate"/>
+                        android:id="@+id/txtDate"/>
                 </LinearLayout>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="$ 70.000 COP"
                     android:textSize="30sp"
-                    android:textColor="@color/green"
+                    android:textColor="@color/black"
                     android:textStyle="bold"
                     android:fontFamily="sans-serif-medium"
                     android:layout_marginTop="20dp"
@@ -109,9 +86,9 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Se entrego/envio paquete a la direccion"
+                    android:text="Tu direccion"
                     android:textSize="20sp"
-                    android:textColor="@color/black"
+                    android:textColor="@color/gray"
                     android:textStyle="bold"
                     android:fontFamily="sans-serif-medium"
                     android:layout_marginTop="20dp"
@@ -125,6 +102,7 @@
                     android:textSize="23sp"
                     android:textStyle="italic"
                     android:layout_marginTop="20dp"
+                    android:layout_marginStart="20dp"
                     android:layout_marginBottom="10dp"
                     android:layout_below="@+id/txtCartDirection"
                     android:id="@+id/txt1"/>
@@ -135,4 +113,30 @@
                     android:id="@+id/rvCartProducts"/>
             </RelativeLayout>
         </ScrollView>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:orientation="vertical"
+            android:layout_margin="30dp">
+            <!--ButtonLayout!-->
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_upload"
+                android:layout_marginBottom="30dp"
+                android:backgroundTint="@color/purple_500"
+                android:id="@+id/btnUpload"/>
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_delete"
+                android:backgroundTint="@color/purple_500"
+                android:id="@+id/btnDelete"/>
+        </LinearLayout>
+    </RelativeLayout>
 </FrameLayout>

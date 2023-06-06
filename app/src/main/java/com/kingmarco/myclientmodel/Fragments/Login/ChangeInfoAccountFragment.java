@@ -18,6 +18,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.ClientHolder;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.InAppSnackBars;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncRealtimeDB;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.SnackBarsInfo;
@@ -43,10 +44,7 @@ public class ChangeInfoAccountFragment extends Fragment implements GetFireStoreD
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setLabelName = (SetLabelName) getContext();
-        Bundle data = getArguments();
-        if (data != null){
-            client = getArguments().getParcelable("client");
-        }
+        client = ClientHolder.getYouClient();
     }
 
     @Override

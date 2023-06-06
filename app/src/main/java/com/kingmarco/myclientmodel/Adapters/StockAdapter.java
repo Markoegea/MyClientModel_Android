@@ -1,11 +1,12 @@
 package com.kingmarco.myclientmodel.Adapters;
 
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,15 +18,19 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.request.RequestOptions;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.GlideApp;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.InAppSnackBars;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFireStoreDB;
+import com.kingmarco.myclientmodel.Auxiliary.Enums.CartStatus;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.SnackBarsInfo;
+import com.kingmarco.myclientmodel.Auxiliary.Enums.StockType;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetFireStoreDB;
+import com.kingmarco.myclientmodel.POJOs.Carts;
 import com.kingmarco.myclientmodel.POJOs.Products;
 import com.kingmarco.myclientmodel.POJOs.Promotions;
+import com.kingmarco.myclientmodel.POJOs.Stock;
 import com.kingmarco.myclientmodel.R;
 
 import java.text.DecimalFormat;
@@ -35,11 +40,12 @@ import java.util.ArrayList;
 public class StockAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements GetFireStoreDB {
 
     private final FirebaseStorage storage = FirebaseStorage.getInstance();
-    private ArrayList<Parcelable> database;
+    private ArrayList<Stock> database;
     private final FragmentActivity fragmentActivity;
-    private View contentView;
     private final Fragment fragment;
+    private View contentView;
     private int actionId;
+    private Carts carts = null;
 
     public StockAdapter(FragmentActivity fragmentActivity,Fragment fragment) {
         this.fragmentActivity = fragmentActivity;
@@ -47,7 +53,7 @@ public class StockAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         this.actionId = -1;
     }
 
-    public void setDatabase(ArrayList<Parcelable> database) {
+    public void setDatabase(ArrayList<Stock> database) {
         this.database = database;
         notifyDataSetChanged();
     }
@@ -58,6 +64,10 @@ public class StockAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     public void setActionId(int actionId) {
         this.actionId = actionId;
+    }
+
+    public void setCarts(Carts carts) {
+        this.carts = carts;
     }
 
     @NonNull
@@ -72,60 +82,72 @@ public class StockAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         ViewHolderParcelable viewHolderParcelable = (ViewHolderParcelable) holder;
-        if (database.get(position) instanceof Products) {
-            withAProduct((Products) database.get(position), viewHolderParcelable);
-        } else if (database.get(position) instanceof Promotions) {
-            withAPPromotion((Promotions) database.get(position),viewHolderParcelable);
-        }
+        organizeData( database.get(position), viewHolderParcelable);
     }
 
-    /**Set the image, name, price and button action of the item in the recycler view*/
-    private void withAProduct(Products product,ViewHolderParcelable holder){
-        if(product.getUrl() != null){
-            StorageReference gsReference = storage.getReferenceFromUrl(product.getUrl().get(0));
+    private void organizeData(Stock stock, ViewHolderParcelable holder){
+        if(stock.getUrl() != null){
+            StorageReference gsReference = storage.getReferenceFromUrl(stock.getUrl().get(0));
             GlideApp.with(fragment.getContext())
                     .load(gsReference)
                     .apply(RequestOptions.circleCropTransform())
                     .into(holder.imageView);
         }
-        holder.txtParcelableName.setText(product.getName());
-        String price = "$ "+ new DecimalFormat("###,###,###").format(product.getPrice())+" COP" ;
+        holder.txtParcelableName.setText(stock.getName());
+        String price = "$ "+ new DecimalFormat("###,###,###").format(stock.getPrice())+" COP" ;
         holder.txtParcelablePrice.setText(price);
-        if (actionId == -1){return;}
-        holder.cardView.setOnClickListener(new View.OnClickListener() {
+        if (actionId != -1){
+            holder.cardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Bundle bundle = new Bundle();
+                    bundle.putLong("stock",stock.getId());
+                    NavController nav = NavHostFragment.findNavController(fragment);
+                    nav.navigate(actionId,bundle);
+                }
+            });
+        }
+        if (carts == null){return;}
+        if (carts.getStatus() != CartStatus.DRAFT){return;}
+        if (stock instanceof Products){
+            setCartBehavior(carts,stock,StockType.PRODUCT,holder);
+        } else if (stock instanceof Promotions){
+            setCartBehavior(carts,stock,StockType.PROMOTION,holder);
+        }
+    }
+
+    private void setCartBehavior(Carts carts, Stock stock, StockType stockType, ViewHolderParcelable holder){
+        GetFireStoreDB getFireStoreDB = (GetFireStoreDB) fragment;
+        if (carts.getPurchasedItemsId() == null){return;}
+        ArrayList<Long> stockId = carts.getPurchasedItemsId().get(stockType.name());
+        if (stockId == null){return;}
+
+        holder.linearLayout.setVisibility(View.VISIBLE);
+        holder.btnDelete.setVisibility(View.VISIBLE);
+        int quantity = 0;
+        for (Long id : stockId){
+            if (id.longValue() == stock.getId().longValue()){
+                quantity += 1;
+            }
+        }
+        holder.txtParcelableQuantity.setText(String.valueOf(quantity));
+        holder.btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Bundle bundle = new Bundle();
-                bundle.putParcelable("product",product);
-                NavController nav = NavHostFragment.findNavController(fragment);
-                nav.navigate(actionId,bundle);
+            public void onClick(View v) {
+                ArrayList<Long> stockId = carts.getPurchasedItemsId().get(stockType.name());
+                if (stockId == null){return;}
+                for (Long id : stockId){
+                    if (id.longValue() == stock.getId().longValue()){
+                        stockId.remove(id);
+                        carts.setTotalPrice(carts.getTotalPrice() - stock.getPrice());
+                        break;
+                    }
+                }
+                SyncFireStoreDB.updateCartRequest(carts,getFireStoreDB);
             }
         });
     }
 
-    /**Set the image, name, price and button action of the item in the recycler view*/
-    private void withAPPromotion(Promotions promotions, ViewHolderParcelable holder){
-        if(promotions.getUrl() != null){
-            StorageReference gsReference = storage.getReferenceFromUrl(promotions.getUrl().get(0));
-            GlideApp.with(fragment.getContext())
-                    .load(gsReference)
-                    .apply(RequestOptions.circleCropTransform())
-                    .into(holder.imageView);
-        }
-        holder.txtParcelableName.setText(promotions.getName());
-        String price = "$ "+ new DecimalFormat("###,###,###").format(promotions.getPrice())+" COP" ;
-        holder.txtParcelablePrice.setText(price);
-        if (actionId == -1){return;}
-        holder.cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Bundle data = new Bundle();
-                data.putParcelable("promotion", promotions);
-                NavController nav = NavHostFragment.findNavController(fragment);
-                nav.navigate(actionId,data);
-            }
-        });
-    }
     @Override
     public int getItemCount() {
         if (database == null){return 0;}
@@ -142,7 +164,10 @@ public class StockAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
         private CardView cardView;
         private ImageView imageView;
-        private TextView txtParcelableName, txtParcelablePrice;
+        private TextView txtParcelableName, txtParcelablePrice, txtParcelableQuantity;
+        private Button btnDelete;
+        private LinearLayout linearLayout;
+
 
         public ViewHolderParcelable(@NonNull View itemView) {
             super(itemView);
@@ -150,6 +175,9 @@ public class StockAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             imageView = itemView.findViewById(R.id.ivParcelable);
             txtParcelableName = itemView.findViewById(R.id.txtParcelableName);
             txtParcelablePrice = itemView.findViewById(R.id.txtParcelablePrice);
+            txtParcelableQuantity = itemView.findViewById(R.id.txtParcelableQuantity);
+            btnDelete = itemView.findViewById(R.id.btnDelete);
+            linearLayout = itemView.findViewById(R.id.ll1);
         }
     }
 }

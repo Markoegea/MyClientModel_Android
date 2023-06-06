@@ -10,24 +10,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.firebase.firestore.ListenerRegistration;
 import com.kingmarco.myclientmodel.Adapters.StockAdapter;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.ClientHolder;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFireStoreDB;
-import com.kingmarco.myclientmodel.Auxiliary.Interfaces.ClientObserver;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.StockHolder;
+import com.kingmarco.myclientmodel.Auxiliary.Enums.StockType;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
-import com.kingmarco.myclientmodel.POJOs.Clients;
-import com.kingmarco.myclientmodel.POJOs.Products;
-import com.kingmarco.myclientmodel.POJOs.Promotions;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.StockObserver;
 import com.kingmarco.myclientmodel.R;
 
 /**The fragment responsible to show the promotion products in a recycler view*/
-public class PromotionFragment extends Fragment implements ClientObserver {
+public class PromotionFragment extends Fragment implements StockObserver {
 
     private SetLabelName setLabelName;
     private RecyclerView rvPromProducts;
     private StockAdapter stockAdapter;
-    private ListenerRegistration listenerRegistration;
 
     public PromotionFragment() {
         // Required empty public constructor
@@ -40,6 +35,7 @@ public class PromotionFragment extends Fragment implements ClientObserver {
         /**Set the promotion adapter*/
         stockAdapter = new StockAdapter(getActivity(),this);
         stockAdapter.setActionId(R.id.action_promotionFragment_to_promotionDetailsFragment);
+        onVariableChange();
     }
 
     @Override
@@ -60,43 +56,25 @@ public class PromotionFragment extends Fragment implements ClientObserver {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        ClientHolder.addObserver(this);
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
-        listenerRegistration = SyncFireStoreDB.newListenerRegistration(stockAdapter, Promotions.class,"Promociones");
+        StockHolder.addObserver(this);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        if(listenerRegistration == null){return;}
-        listenerRegistration.remove();
+        StockHolder.removeObserver(this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        ClientHolder.removeObserver(this);
-        if(listenerRegistration == null){return;}
-        listenerRegistration.remove();
+        StockHolder.removeObserver(this);
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        ClientHolder.removeObserver(this);
-        if(listenerRegistration == null){return;}
-        listenerRegistration.remove();
-    }
-
-    @Override
-    public void onVariableChange(Clients client) {
-        if (listenerRegistration != null){return;}
-        listenerRegistration = SyncFireStoreDB.newListenerRegistration(stockAdapter, Promotions.class,"Promociones");
+    public void onVariableChange() {
+        stockAdapter.setDatabase(StockHolder.getList(StockType.PROMOTION));
     }
 }

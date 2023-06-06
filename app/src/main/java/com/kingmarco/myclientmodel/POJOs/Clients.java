@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import java.util.ArrayList;
 
 /**The class Clients that is used to organize the information of the client and parcel it to pass to others fragments*/
-public class Clients implements Parcelable {
+public class Clients {
 
     private String id;
     private int messagingId;
@@ -26,19 +26,6 @@ public class Clients implements Parcelable {
     private Double longitude;
     private String directions;
 
-
-    public static final Creator<Clients> CREATOR = new Creator<Clients>() {
-        @Override
-        public Clients createFromParcel(Parcel parcel) {
-            return new Clients(parcel);
-        }
-
-        @Override
-        public Clients[] newArray(int i) {
-            return new Clients[0];
-        }
-    };
-
     public Clients() {
     }
 
@@ -55,42 +42,6 @@ public class Clients implements Parcelable {
         this.latitude = latitude;
         this.longitude = longitude;
         this.directions = directions;
-    }
-
-    protected Clients(Parcel in){
-        this.id = in.readString();
-        this.messagingId = in.readInt();
-        this.imageUrl = in.readString();
-        this.name = in.readString();
-        this.lastName = in.readString();
-        this.documentID = in.readString();
-        this.documentType = in.readString();
-        this.age = in.readInt();
-        this.phoneNumber = in.readString();
-        this.latitude = in.readDouble();
-        this.longitude = in.readDouble();
-        this.directions = in.readString();
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(@NonNull Parcel parcel, int i) {
-        parcel.writeString(this.id);
-        parcel.writeInt(this.messagingId);
-        parcel.writeString(this.imageUrl);
-        parcel.writeString(this.name);
-        parcel.writeString(this.lastName);
-        parcel.writeString(this.documentID);
-        parcel.writeString(this.documentType);
-        parcel.writeInt(this.age);
-        parcel.writeString(this.phoneNumber);
-        parcel.writeDouble(this.latitude);
-        parcel.writeDouble(this.longitude);
-        parcel.writeString(this.directions);
     }
 
     public String getId() {

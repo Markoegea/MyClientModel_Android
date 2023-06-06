@@ -44,6 +44,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.ClientHolder;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.InAppSnackBars;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.SnackBarsInfo;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetFireStoreDB;
@@ -99,10 +100,7 @@ public class ChangeLocationDataFragment extends Fragment implements OnMapReadyCa
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setLabelName = (SetLabelName) getContext();
-        Bundle data = getArguments();
-        if (data != null){
-            client = getArguments().getParcelable("client");
-        }
+        client = ClientHolder.getYouClient();
     }
 
     @Override

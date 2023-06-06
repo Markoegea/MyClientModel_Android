@@ -23,8 +23,7 @@ public class SyncRealtimeDB {
     private ValueEventListener eventListener;
     private boolean isListening = false;
     private Chats myChat;
-    private final ArrayList<Messages> allMessages = new ArrayList<>();
-    private final ArrayList<GetRealtimeDB> observers = new ArrayList<>();
+
 
     public static SyncRealtimeDB getInstance(){
         if(sharedInstance == null){
@@ -58,28 +57,27 @@ public class SyncRealtimeDB {
                 lastMessage.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        allMessages.clear();
+                        MessagesHolder.clearMessageList();
                         for (DataSnapshot dataSnapshot : snapshot.getChildren()){
                             Messages message = dataSnapshot.getValue(Messages.class);
                             if(message == null){return;}
-                            message.getTimestamp().newDateFormat();
                             message.setId(dataSnapshot.getKey());
-                            allMessages.add(message);
+                            MessagesHolder.addMessageToList(message);
                             myChat.setMessages(message);
                         }
-                        notifyObservers();
+                        MessagesHolder.notifyObservers();
                         sendNotifications(notificationTemplate);
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-                        notifyObservers(SnackBarsInfo.MESSAGES_ERROR);
+                        MessagesHolder.notifyObservers(SnackBarsInfo.MESSAGES_ERROR);
                     }
                 });
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                notifyObservers(SnackBarsInfo.CHATS_ERROR);
+                MessagesHolder.notifyObservers(SnackBarsInfo.CHATS_ERROR);
             }
         };
     }
@@ -93,6 +91,7 @@ public class SyncRealtimeDB {
 
     public void stopListening(){
         if(this.destinyReference == null){return;}
+        MessagesHolder.clearMessageList();
         this.destinyReference.removeEventListener(this.eventListener);
         isListening = false;
     }
@@ -102,27 +101,6 @@ public class SyncRealtimeDB {
         if(isListening){return;}
         this.destinyReference.addValueEventListener(this.eventListener);
         isListening = true;
-    }
-
-    public void addObserver(GetRealtimeDB observer){
-        observers.add(observer);
-        notifyObservers();
-    }
-
-    public void removeObserver(GetRealtimeDB observer){
-        observers.remove(observer);
-    }
-
-    private void notifyObservers(){
-        for (GetRealtimeDB observer: observers){
-            observer.getSyncRealtimeDB(allMessages);
-        }
-    }
-
-    private void notifyObservers(SnackBarsInfo snackBarsInfo){
-        for (GetRealtimeDB observer: observers){
-            observer.getSyncRealtimeDB(snackBarsInfo);
-        }
     }
 
     public void uploadChat(String information, String field){

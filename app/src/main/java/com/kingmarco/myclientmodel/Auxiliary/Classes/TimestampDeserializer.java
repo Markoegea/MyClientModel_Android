@@ -27,8 +27,15 @@ public class TimestampDeserializer implements Parcelable {
         }
     };
 
+    public static TimestampDeserializer generateNewTimestamp(){
+        Timestamp timestamp = Timestamp.now();
+        return new TimestampDeserializer(timestamp.getSeconds(), timestamp.getNanoseconds());
+    }
+
+
     public TimestampDeserializer() {
     }
+
     protected TimestampDeserializer(Parcel in){
         this.seconds = in.readLong();
         this.nanoseconds = in.readInt();
@@ -62,16 +69,17 @@ public class TimestampDeserializer implements Parcelable {
         return nanoseconds;
     }
 
-    public String getDateFormat(){
-        return dateFormat;
-    }
-
-    public void newDateFormat(){
-        if (seconds == 0F || nanoseconds == 0 ){
-            return;
+    @NonNull
+    @Override
+    public String toString() {
+        if (dateFormat == null){
+            if (seconds == 0F || nanoseconds == 0 ){
+                return "No Exist";
+            }
+            Timestamp timestamp = new Timestamp(seconds,nanoseconds);
+            SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy hh:mm a", Locale.getDefault());
+            this.dateFormat = sdf.format(timestamp.toDate());
         }
-        Timestamp timestamp = new Timestamp(seconds,nanoseconds);
-        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy hh:mm a", Locale.getDefault());
-        this.dateFormat = sdf.format(timestamp.toDate());
+        return dateFormat;
     }
 }

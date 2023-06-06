@@ -19,6 +19,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.kingmarco.myclientmodel.Adapters.MessagesAdapter;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.ClientHolder;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.InAppSnackBars;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.MessagesHolder;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncAuthDB;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncRealtimeDB;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.TimestampDeserializer;
@@ -114,27 +115,21 @@ public class ChatFragment extends Fragment implements GetRealtimeDB {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        SyncRealtimeDB.getInstance().addObserver(this);
+    public void onResume() {
+        super.onResume();
+        MessagesHolder.addObserver(this);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        SyncRealtimeDB.getInstance().removeObserver(this);
+        MessagesHolder.removeObserver(this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        SyncRealtimeDB.getInstance().removeObserver(this);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        SyncRealtimeDB.getInstance().removeObserver(this);
+        MessagesHolder.removeObserver(this);
     }
 
     @Override

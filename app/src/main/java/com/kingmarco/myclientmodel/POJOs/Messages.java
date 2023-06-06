@@ -4,7 +4,6 @@ import com.kingmarco.myclientmodel.Auxiliary.Classes.TimestampDeserializer;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.MessagesStatus;
 
 public class Messages {
-    //TODO: Set the field for the image
     private String id;
     private Integer senderId;
     private String senderName;

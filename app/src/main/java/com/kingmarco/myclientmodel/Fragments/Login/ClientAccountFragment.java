@@ -118,8 +118,6 @@ public class ClientAccountFragment extends Fragment implements ClientObserver, G
     private void setListeners(Clients client){
         /**Navigate to other fragments*/
         txtInfo.setText(client.getDirections());
-        Bundle bundle = new Bundle();
-        bundle.putParcelable("client",client);
         btnUploadImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -129,19 +127,19 @@ public class ClientAccountFragment extends Fragment implements ClientObserver, G
         cvPersonalData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                nav.navigate(R.id.action_clientAccountFragment_to_changeInfoAccountFragment,bundle);
+                nav.navigate(R.id.action_clientAccountFragment_to_changeInfoAccountFragment);
             }
         });
         cvLocationData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                nav.navigate(R.id.action_clientAccountFragment_to_changeLocationDataFragment,bundle);
+                nav.navigate(R.id.action_clientAccountFragment_to_changeLocationDataFragment);
             }
         });
         cvLoginData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                nav.navigate(R.id.action_clientAccountFragment_to_changeLoginDataFragment,bundle);
+                nav.navigate(R.id.action_clientAccountFragment_to_changeLoginDataFragment);
             }
         });
         cvLogOut.setOnClickListener(new View.OnClickListener() {
@@ -154,20 +152,24 @@ public class ClientAccountFragment extends Fragment implements ClientObserver, G
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onResume() {
+        super.onResume();
+        if(!SyncAuthDB.getInstance().isLogin() || ClientHolder.getYouClient() == null){
+            onLogOut();
+            return;
+        }
         ClientHolder.addObserver(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        ClientHolder.removeObserver(this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        ClientHolder.removeObserver(this);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
         ClientHolder.removeObserver(this);
     }
 
@@ -219,6 +221,7 @@ public class ClientAccountFragment extends Fragment implements ClientObserver, G
         onCompleteFireStoreRequest(SnackBarsInfo.LOG_OUT_SUCCESS);
         if (getActivity() != null){
             getActivity().onBackPressed();
+            return;
         }
         NavController nav = NavHostFragment.findNavController(this);
         nav.navigate(R.id.loginFragment);

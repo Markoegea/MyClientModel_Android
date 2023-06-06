@@ -91,7 +91,7 @@ public class MessagesAdapter extends BaseAdapter {
 
         public void setTextInfo(){
             txtMessageText.setText(messages.getText());
-            txtMessageTime.setText(messages.getTimestamp().getDateFormat());
+            txtMessageTime.setText(messages.getTimestamp().toString());
             switch (messages.getStatus()){
                 case SENT:
                     txtStatus.setText("Enviado");

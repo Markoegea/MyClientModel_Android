@@ -1,18 +1,5 @@
 package com.kingmarco.myclientmodel.Activity;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-import androidx.fragment.app.FragmentManager;
-import androidx.navigation.NavController;
-import androidx.navigation.NavDestination;
-import androidx.navigation.fragment.NavHostFragment;
-
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Notification;
@@ -33,28 +20,44 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.RemoteViews;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.fragment.app.FragmentManager;
+import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
+import androidx.navigation.fragment.NavHostFragment;
+
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.NotificationTarget;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.CartHolder;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.ClientHolder;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.GlideApp;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncAuthDB;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFireStoreDB;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncRealtimeDB;
+import com.kingmarco.myclientmodel.Auxiliary.Enums.StockType;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.ClientObserver;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetAuthDB;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.NotificationTemplate;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
-import com.kingmarco.myclientmodel.POJOs.Chats;
 import com.kingmarco.myclientmodel.POJOs.Clients;
 import com.kingmarco.myclientmodel.R;
 
-import org.checkerframework.checker.units.qual.C;
+import java.util.ArrayList;
 
+
+//TODO: CHECK THE CODE AND COMMIT
 public class MainActivity extends AppCompatActivity implements SetLabelName, GetAuthDB, ClientObserver
         , NotificationTemplate {
 
@@ -64,10 +67,13 @@ public class MainActivity extends AppCompatActivity implements SetLabelName, Get
     private final String CHANNEL_LOW = "my_message_channel_id";
     private final int SUMMARY_ID = 0;
     private final String GROUP_KEY_MESSAGES = "ClientsMessages";
+    private ListenerRegistration cartListener, productListener, promotionListener;
     private BottomNavigationView bottomNavigationView;
     private Toolbar tbActivity;
     private NavController navController;
     private SyncRealtimeDB syncRealtimeDB;
+    private View fragment;
+    private ViewGroup.MarginLayoutParams layoutParams;
 
     /**The Main Class, that control the bottom navigation bar, how it works to navigate to other fragments
        The label name of the fragments, and the what happens when the back button is pressed*/
@@ -88,8 +94,12 @@ public class MainActivity extends AppCompatActivity implements SetLabelName, Get
         getSupportActionBar().setHomeButtonEnabled(true);
 
         /**Basic Configuration Bottom Navigator View*/
-        NavHostFragment host = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentContainerView);
+        fragment = findViewById(R.id.fragmentContainerView);
+
+        NavHostFragment host = (NavHostFragment) getSupportFragmentManager().findFragmentById(fragment.getId());
         navController = host.getNavController();
+
+        layoutParams = (ViewGroup.MarginLayoutParams) fragment.getLayoutParams();
 
 
         /**Show the bottom navigation bar depends of the name fragment*/
@@ -143,10 +153,15 @@ public class MainActivity extends AppCompatActivity implements SetLabelName, Get
     private void setToolbarBehavior(int behavior) {
         switch (behavior){
             case NAVIGATION_ENABLE:
+                float density = getResources().getDisplayMetrics().density;
+                layoutParams.bottomMargin = (int) (50 * density + 0.5f);
+                fragment.setLayoutParams(layoutParams);
                 bottomNavigationView.setVisibility(View.VISIBLE);
                 setSupportActionBar(tbActivity);
                 break;
             case NAVIGATION_DISABLE:
+                layoutParams.bottomMargin = 0;
+                fragment.setLayoutParams(layoutParams);
                 bottomNavigationView.setVisibility(View.GONE);
                 tbActivity.setNavigationIcon(R.drawable.ic_back);
                 tbActivity.setNavigationOnClickListener(new View.OnClickListener() {
@@ -338,6 +353,8 @@ public class MainActivity extends AppCompatActivity implements SetLabelName, Get
         super.onStart();
         ClientHolder.addObserver(this);
         SyncAuthDB.getInstance().addListenerAuth(this);
+        productListener = SyncFireStoreDB.newCartListenerRegistration(StockType.PRODUCT,"Productos");
+        promotionListener = SyncFireStoreDB.newCartListenerRegistration(StockType.PROMOTION,"Promociones");
     }
 
     @Override
@@ -347,6 +364,14 @@ public class MainActivity extends AppCompatActivity implements SetLabelName, Get
         ClientHolder.removeObserver(this);
         SyncAuthDB.getInstance().removeListenerClient();
         SyncAuthDB.getInstance().removeListenerAuth(this);
+        if (productListener != null ){
+            productListener.remove();
+            productListener = null;
+        }
+        if(promotionListener != null){
+            promotionListener.remove();
+            promotionListener = null;
+        }
     }
 
     @Override
@@ -355,6 +380,7 @@ public class MainActivity extends AppCompatActivity implements SetLabelName, Get
             syncRealtimeDB.stopListening();
             return;
         }
+        cartListener = SyncFireStoreDB.newCartListenerRegistration();
         syncRealtimeDB.listening(FirebaseDatabase.getInstance()
                 .getReference("chats/"+client.getMessagingId()),this);
         syncRealtimeDB.startListening();
@@ -367,6 +393,11 @@ public class MainActivity extends AppCompatActivity implements SetLabelName, Get
         }else{
             SyncAuthDB.getInstance().removeListenerClient();
             syncRealtimeDB.stopListening();
+
+            if(cartListener == null){return;}
+            CartHolder.clearCartList();
+            cartListener.remove();
+            cartListener = null;
         }
     }
 }

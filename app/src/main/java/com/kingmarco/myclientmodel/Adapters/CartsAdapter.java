@@ -16,9 +16,17 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.request.RequestOptions;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.GlideApp;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.StockHolder;
+import com.kingmarco.myclientmodel.Auxiliary.Enums.CartStatus;
+import com.kingmarco.myclientmodel.Auxiliary.Enums.StockType;
 import com.kingmarco.myclientmodel.POJOs.Carts;
 import com.kingmarco.myclientmodel.POJOs.Products;
 import com.kingmarco.myclientmodel.POJOs.Promotions;
+import com.kingmarco.myclientmodel.POJOs.Stock;
 import com.kingmarco.myclientmodel.R;
 
 import java.util.ArrayList;
@@ -26,20 +34,25 @@ import java.util.ArrayList;
 /**Adapter to the Recycler View in the Cart fragment*/
 public class CartsAdapter extends RecyclerView.Adapter<CartsAdapter.ViewHolder>{
 
+    private final FirebaseStorage storage = FirebaseStorage.getInstance();
     private ArrayList<Carts> database = new ArrayList<>();
     private FragmentActivity fragmentActivity;
     private Fragment fragment;
     private int actionId;
 
-    public CartsAdapter(FragmentActivity fragmentActivity, Fragment fragment, int actionId) {
+    public CartsAdapter(FragmentActivity fragmentActivity, Fragment fragment) {
         this.fragmentActivity = fragmentActivity;
         this.fragment = fragment;
-        this.actionId = actionId;
+        this.actionId = -1;
     }
 
     public void setDatabase(ArrayList<Carts> database) {
         this.database = database;
         notifyDataSetChanged();
+    }
+
+    public void setActionId(int actionId) {
+        this.actionId = actionId;
     }
 
     @NonNull
@@ -60,31 +73,26 @@ public class CartsAdapter extends RecyclerView.Adapter<CartsAdapter.ViewHolder>{
 
         if(cart == null){return;}
 
-        if(cart.getPurchasedProducts() == null){return;}
+        if(cart.getPurchasedItemsId() == null){return;}
 
-        /**Check if the purchased product is a class of Product or PromoProduct*/
-        /*for(Parcelable parcelable: cart.getPurchasedProducts()){
-            if(parcelable instanceof Products){
-                if(isAProduct(holder,parcelable,name,hasImage)){
-                    hasImage = true;
-                }
-            } else if (parcelable instanceof Promotions){
-                if(isAPromotion(holder,parcelable,name,hasImage)) {
-                    hasImage = true;
-                }
-            }
-        }*/
+        iterateOverStock(holder,StockType.PRODUCT,cart,name,hasImage);
+        iterateOverStock(holder,StockType.PROMOTION,cart,name,hasImage);
+
         holder.txtProductName.setText(name);
 
         String date;
         if(cart.getArrivedDate() == null){
-            date = "Lo compraste el " + cart.getPurchasedDate().toString();
-        } else{
+            if (cart.getPurchasedDate() == null){
+                date = "En Espera";
+            } else {
+                date = "Lo compraste el " + cart.getPurchasedDate().toString();
+            }
+        } else {
             date = "Te llego el " + cart.getArrivedDate().toString();
         }
         holder.txtDate.setText(date);
 
-        holder.txtStatus.setText(cart.getStatus());
+        holder.txtStatus.setText(getSpanishStatus(cart.getStatus()));
 
         /**Set the button lister to navigate to another fragment, with the details of the parcelable object*/
         holder.cardView.setOnClickListener(new View.OnClickListener() {
@@ -92,37 +100,57 @@ public class CartsAdapter extends RecyclerView.Adapter<CartsAdapter.ViewHolder>{
             public void onClick(View view) {
                 NavController nav = NavHostFragment.findNavController(fragment);
                 Bundle data = new Bundle();
-                data.putParcelable("cart",cart);
+                data.putLong("cartID",cart.getId());
                 data.putString("cartName",name.toString());
                 nav.navigate(actionId,data);
             }
         });
     }
 
-    /**If is a product append the name to the name variable and load the image*/
-    private boolean isAProduct(@NonNull ViewHolder holder, Parcelable product, StringBuilder name, boolean hasImage){
-        Products cartProduct = (Products) product;
+    private void iterateOverStock(@NonNull ViewHolder holder, StockType stockType, Carts cart, StringBuilder name, boolean hasImage){
+        ArrayList<Long> stockId = cart.getPurchasedItemsId().get(stockType.name());
+        if (stockId != null){
+            for(Long id: stockId){
+                Stock stock = StockHolder.getSingleStockItem(stockType,id);
+                if (stock == null){return;}
+                if(!getNameAndPhoto(holder,stock,name,hasImage)){continue;}
+                hasImage = true;
+            }
+        }
+    }
 
-        if(cartProduct.getName() == null){return false;}
-        name.append(cartProduct.getName()+", ");
+    private boolean getNameAndPhoto(@NonNull ViewHolder holder, Stock stock, StringBuilder name, boolean hasImage){
+        if(stock.getName() == null){return false;}
+        name.append(stock.getName()).append(", ");
 
-        if(cartProduct.getUrl().get(0) == null || hasImage){return false;}
-        //new ImageThreads(cartProduct.getUrl().get(0),holder.ivCart,fragmentActivity).start();
+        if(stock.getUrl().get(0) == null || hasImage){return false;}
+        StorageReference gsReference = storage.getReferenceFromUrl(stock.getUrl().get(0));
+        GlideApp.with(fragment.getContext())
+                .load(gsReference)
+                .apply(RequestOptions.circleCropTransform())
+                .into(holder.ivCart);
         return true;
     }
 
-    /**If is a promotion append the name to the name variable and load the image*/
-    private boolean isAPromotion(@NonNull ViewHolder holder, Parcelable promotion, StringBuilder name, boolean hasImage){
-        Promotions cartPromo = (Promotions) promotion;
-
-        if(cartPromo.getProducts() == null){return false;}
-        /*for(Products product : cartPromo.getProducts()){
-            name.append(product.getName()+", ");
+    private String getSpanishStatus(CartStatus cartStatus){
+        switch (cartStatus){
+            case SENT:
+                return "Enviado";
+            case FAILED:
+                return "Envio Fallido";
+            case CANCELED:
+                return "Envio Cancelado";
+            case RECEIVED:
+                return "Envio Recibido";
+            case RETURNED:
+                return "Envio en Regresado";
+            case DELIVERED:
+                return "Envio en Camino";
+            case PROCESSED:
+                return "Envio en Proceso";
+            default:
+                return "Borrador";
         }
-
-        if(cartPromo.getUrl() == null || hasImage){return false;}
-        new ImageThreads(cartPromo.getUrl(),holder.ivCart,fragmentActivity).start();*/
-        return true;
     }
 
     @Override
