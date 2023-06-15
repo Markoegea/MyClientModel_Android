@@ -12,17 +12,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.kingmarco.myclientmodel.Adapters.StockAdapter;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.CartHolder;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.ClientHolder;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.InAppSnackBars;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.StockHolder;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFireStoreDB;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.TimestampDeserializer;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.CartHolder;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.ClientHolder;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Static.InAppSnackBars;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.StockHolder;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFirebase.SyncRealtimeDB;
+import com.kingmarco.myclientmodel.POJOs.TimestampDeserializer;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.CartStatus;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.SnackBarsInfo;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.StockType;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.CartObserver;
-import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetFireStoreDB;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetRealtimeDB;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
 import com.kingmarco.myclientmodel.POJOs.Carts;
 import com.kingmarco.myclientmodel.POJOs.Clients;
@@ -34,8 +34,7 @@ import java.util.ArrayList;
 
 
 /** The Fragment responsible to show the the detail of the cart*/
-//TODO: When the user upload the cart, the buttons to erase and upload the cart have to disappear
-public class CartDetailsFragment extends Fragment implements GetFireStoreDB, CartObserver {
+public class CartDetailsFragment extends Fragment implements GetRealtimeDB, CartObserver {
 
     private SetLabelName setLabelName;
     private Carts cart;
@@ -113,7 +112,7 @@ public class CartDetailsFragment extends Fragment implements GetFireStoreDB, Car
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SyncFireStoreDB.deleteCartRequest(cart,CartDetailsFragment.this,CartDetailsFragment.this);
+                SyncRealtimeDB.deleteCartRequest(cart,CartDetailsFragment.this);
                 if(getActivity() == null){return;}
                 getActivity().onBackPressed();
             }
@@ -123,7 +122,7 @@ public class CartDetailsFragment extends Fragment implements GetFireStoreDB, Car
             public void onClick(View v) {
                 cart.setStatus(CartStatus.SENT);
                 cart.setPurchasedDate(TimestampDeserializer.generateNewTimestamp());
-                SyncFireStoreDB.updateCartRequest(cart,CartDetailsFragment.this);
+                SyncRealtimeDB.updateCartRequest(cart,CartDetailsFragment.this);
             }
         });
     }
@@ -218,13 +217,17 @@ public class CartDetailsFragment extends Fragment implements GetFireStoreDB, Car
         }
         ArrayList<Long> productsId = cart.getPurchasedItemsId().get(StockType.PRODUCT.name());
         ArrayList<Long> promotionsId = cart.getPurchasedItemsId().get(StockType.PROMOTION.name());
-        if (productsId == null || promotionsId == null){
-            return true;
+        if (productsId != null){
+            if (!productsId.isEmpty()){
+                return false;
+            }
         }
-        if (productsId.isEmpty() && promotionsId.isEmpty()){
-            return true;
+        if (promotionsId != null){
+            if (!promotionsId.isEmpty()){
+                return false;
+            }
         }
-        return false;
+        return true;
     }
 
     @Override
@@ -249,7 +252,7 @@ public class CartDetailsFragment extends Fragment implements GetFireStoreDB, Car
     public void onVariableChange(ArrayList<Carts> carts) {
         if (isEmptyCart()){
             CartHolder.removeObserver(this);
-            SyncFireStoreDB.deleteCartRequest(cart,CartDetailsFragment.this,CartDetailsFragment.this);
+            SyncRealtimeDB.deleteCartRequest(cart,CartDetailsFragment.this);
             if(getActivity() == null){return;}
             getActivity().onBackPressed();
             return;
@@ -260,8 +263,7 @@ public class CartDetailsFragment extends Fragment implements GetFireStoreDB, Car
     }
 
     @Override
-    public void onCompleteFireStoreRequest(SnackBarsInfo snackBarsInfo) {
+    public void getSyncRealtimeDB(SnackBarsInfo snackBarsInfo) {
         InAppSnackBars.defineSnackBarInfo(snackBarsInfo,contentView,getContext(),getActivity(),false);
     }
-
 }

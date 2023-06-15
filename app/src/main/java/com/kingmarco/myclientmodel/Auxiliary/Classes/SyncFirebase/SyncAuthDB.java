@@ -1,4 +1,4 @@
-package com.kingmarco.myclientmodel.Auxiliary.Classes;
+package com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFirebase;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,6 +12,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.ClientHolder;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.SnackBarsInfo;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetAuthDB;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetFireStoreDB;

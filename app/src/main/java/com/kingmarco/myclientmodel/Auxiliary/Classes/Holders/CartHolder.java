@@ -1,4 +1,4 @@
-package com.kingmarco.myclientmodel.Auxiliary.Classes;
+package com.kingmarco.myclientmodel.Auxiliary.Classes.Holders;
 
 import com.kingmarco.myclientmodel.Auxiliary.Enums.CartStatus;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.StockType;
@@ -67,6 +67,7 @@ public class CartHolder {
 
     public static void addObserver(CartObserver observer){
         observers.add(observer);
+        notifyObservers();
     }
 
     public static void removeObserver(CartObserver observer){

@@ -18,18 +18,17 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.kingmarco.myclientmodel.Adapters.StockAdapter;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.ClientHolder;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.ClientHolder;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.GlideApp;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.InAppSnackBars;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.StockHolder;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncAuthDB;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFireStoreDB;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Static.InAppSnackBars;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.StockHolder;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFirebase.SyncAuthDB;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFirebase.SyncRealtimeDB;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.SnackBarsInfo;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.StockType;
-import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetFireStoreDB;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetRealtimeDB;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.StockObserver;
-import com.kingmarco.myclientmodel.POJOs.Products;
 import com.kingmarco.myclientmodel.POJOs.Promotions;
 import com.kingmarco.myclientmodel.R;
 
@@ -37,7 +36,7 @@ import java.text.DecimalFormat;
 
 
 /** The fragment responsible to show the detail of the promotion*/
-public class PromotionDetailsFragment extends Fragment implements GetFireStoreDB, StockObserver {
+public class PromotionDetailsFragment extends Fragment implements StockObserver, GetRealtimeDB {
 
     private final FirebaseStorage storage = FirebaseStorage.getInstance();
     private SetLabelName setLabelName;
@@ -65,7 +64,6 @@ public class PromotionDetailsFragment extends Fragment implements GetFireStoreDB
         if (promotions == null){return;}
         stockAdapter = new StockAdapter(getActivity(),this);
         stockAdapter.setActionId(R.id.action_promotionDetailsFragment_to_productDetailsFragment);
-        onVariableChange();
     }
 
     @Override
@@ -113,11 +111,12 @@ public class PromotionDetailsFragment extends Fragment implements GetFireStoreDB
             @Override
             public void onClick(View v) {
                 if (!SyncAuthDB.getInstance().isLogin()){
-                    onCompleteFireStoreRequest(SnackBarsInfo.LOGIN_ERROR);
+                    getSyncRealtimeDB(SnackBarsInfo.LOGIN_ERROR);
                     return;
                 }
+
                 if (ClientHolder.getYouClient() == null){
-                    onCompleteFireStoreRequest(SnackBarsInfo.DISABLE_ERROR);
+                    getSyncRealtimeDB(SnackBarsInfo.DISABLE_ERROR);
                     return;
                 }
                 addToCart();
@@ -129,9 +128,9 @@ public class PromotionDetailsFragment extends Fragment implements GetFireStoreDB
         String text = edtProductQuantity.getText().toString();
         try{
             int quantity = Integer.parseInt(text);
-            SyncFireStoreDB.uploadCartItemsRequest(promotions,StockType.PROMOTION,quantity,this,this);
+            SyncRealtimeDB.newCartItemsRequest(promotions,StockType.PROMOTION,quantity,this,this);
         } catch (NumberFormatException e){
-            onCompleteFireStoreRequest(SnackBarsInfo.INCOMPLETE_INFO_ERROR);
+            getSyncRealtimeDB(SnackBarsInfo.INCOMPLETE_INFO_ERROR);
         }
     }
 
@@ -154,12 +153,12 @@ public class PromotionDetailsFragment extends Fragment implements GetFireStoreDB
     }
 
     @Override
-    public void onCompleteFireStoreRequest(SnackBarsInfo snackBarsInfo) {
-        InAppSnackBars.defineSnackBarInfo(snackBarsInfo,contentView,getContext(),getActivity(),false);
+    public void onVariableChange() {
+        stockAdapter.setDatabase(StockHolder.getFilterStockList(promotions.getProducts(),StockType.PRODUCT));
     }
 
     @Override
-    public void onVariableChange() {
-        stockAdapter.setDatabase(StockHolder.getList(StockType.PRODUCT));
+    public void getSyncRealtimeDB(SnackBarsInfo snackBarsInfo) {
+        InAppSnackBars.defineSnackBarInfo(snackBarsInfo,contentView,getContext(),getActivity(),false);
     }
 }

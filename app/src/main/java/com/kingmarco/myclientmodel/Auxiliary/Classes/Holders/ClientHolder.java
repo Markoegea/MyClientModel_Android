@@ -1,4 +1,4 @@
-package com.kingmarco.myclientmodel.Auxiliary.Classes;
+package com.kingmarco.myclientmodel.Auxiliary.Classes.Holders;
 
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.ClientObserver;
 import com.kingmarco.myclientmodel.POJOs.Clients;
@@ -22,6 +22,7 @@ public class ClientHolder {
 
     public static void addObserver(ClientObserver observer){
         observers.add(observer);
+        notifyObservers();
     }
 
    public static void removeObserver(ClientObserver observer){

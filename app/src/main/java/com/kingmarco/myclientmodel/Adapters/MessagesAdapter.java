@@ -12,8 +12,8 @@ import android.widget.TextView;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.kingmarco.myclientmodel.Auxiliary.Classes.ClientHolder;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncAuthDB;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.ClientHolder;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFirebase.SyncAuthDB;
 import com.kingmarco.myclientmodel.POJOs.Messages;
 import com.kingmarco.myclientmodel.R;
 

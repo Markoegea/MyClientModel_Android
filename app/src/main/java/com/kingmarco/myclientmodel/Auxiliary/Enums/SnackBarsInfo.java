@@ -2,6 +2,7 @@ package com.kingmarco.myclientmodel.Auxiliary.Enums;
 
 public enum SnackBarsInfo {
     DATA_ERROR,
+    CARTS_ERROR,
     EXIST_ERROR,
     DELETE_ERROR,
     IMAGES_ERROR,

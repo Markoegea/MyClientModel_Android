@@ -14,8 +14,8 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.InAppSnackBars;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncAuthDB;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Static.InAppSnackBars;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFirebase.SyncAuthDB;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.SnackBarsInfo;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetAuthDB;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetFireStoreDB;

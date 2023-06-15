@@ -21,12 +21,13 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.GlideApp;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.InAppSnackBars;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFireStoreDB;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Static.InAppSnackBars;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFirebase.SyncRealtimeDB;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.CartStatus;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.SnackBarsInfo;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.StockType;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetFireStoreDB;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetRealtimeDB;
 import com.kingmarco.myclientmodel.POJOs.Carts;
 import com.kingmarco.myclientmodel.POJOs.Products;
 import com.kingmarco.myclientmodel.POJOs.Promotions;
@@ -35,17 +36,18 @@ import com.kingmarco.myclientmodel.R;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 /**Adapter to the Recycler View in the Home fragment, Promotion Fragment and Promotion Detail Fragment*/
 public class StockAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements GetFireStoreDB {
 
     private final FirebaseStorage storage = FirebaseStorage.getInstance();
-    private ArrayList<Stock> database;
+    private List<Stock> database;
     private final FragmentActivity fragmentActivity;
     private final Fragment fragment;
     private View contentView;
     private int actionId;
-    private Carts carts = null;
+    private Carts carts;
 
     public StockAdapter(FragmentActivity fragmentActivity,Fragment fragment) {
         this.fragmentActivity = fragmentActivity;
@@ -53,7 +55,7 @@ public class StockAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         this.actionId = -1;
     }
 
-    public void setDatabase(ArrayList<Stock> database) {
+    public void setDatabase(List<Stock> database) {
         this.database = database;
         notifyDataSetChanged();
     }
@@ -82,7 +84,7 @@ public class StockAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         ViewHolderParcelable viewHolderParcelable = (ViewHolderParcelable) holder;
-        organizeData( database.get(position), viewHolderParcelable);
+        organizeData(database.get(position), viewHolderParcelable);
     }
 
     private void organizeData(Stock stock, ViewHolderParcelable holder){
@@ -117,7 +119,7 @@ public class StockAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     private void setCartBehavior(Carts carts, Stock stock, StockType stockType, ViewHolderParcelable holder){
-        GetFireStoreDB getFireStoreDB = (GetFireStoreDB) fragment;
+        GetRealtimeDB getRealtimeDB = (GetRealtimeDB) fragment;
         if (carts.getPurchasedItemsId() == null){return;}
         ArrayList<Long> stockId = carts.getPurchasedItemsId().get(stockType.name());
         if (stockId == null){return;}
@@ -143,7 +145,7 @@ public class StockAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         break;
                     }
                 }
-                SyncFireStoreDB.updateCartRequest(carts,getFireStoreDB);
+                SyncRealtimeDB.updateCartRequest(carts,getRealtimeDB);
             }
         });
     }

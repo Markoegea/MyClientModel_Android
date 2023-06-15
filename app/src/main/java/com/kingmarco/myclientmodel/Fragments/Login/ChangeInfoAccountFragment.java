@@ -15,12 +15,14 @@ import android.widget.Spinner;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.ClientHolder;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.InAppSnackBars;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncRealtimeDB;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.ClientHolder;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Static.InAppSnackBars;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFirebase.SyncRealtimeDB;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.SnackBarsInfo;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetFireStoreDB;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
@@ -152,8 +154,8 @@ public class ChangeInfoAccountFragment extends Fragment implements GetFireStoreD
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()){
-                    SyncRealtimeDB syncRealtimeDB = SyncRealtimeDB.getInstance();
-                    syncRealtimeDB.uploadChat(client.getName(),"name");
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("chats/"+client.getMessagingId());
+                    SyncRealtimeDB.uploadChat(databaseReference,client.getName(),"name");
                     onCompleteFireStoreRequest(SnackBarsInfo.UPDATE_SUCCESS);
                 } else{
                     onCompleteFireStoreRequest(SnackBarsInfo.DATA_ERROR);

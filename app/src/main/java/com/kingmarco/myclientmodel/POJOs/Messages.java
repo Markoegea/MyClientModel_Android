@@ -1,6 +1,5 @@
 package com.kingmarco.myclientmodel.POJOs;
 
-import com.kingmarco.myclientmodel.Auxiliary.Classes.TimestampDeserializer;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.MessagesStatus;
 
 public class Messages {

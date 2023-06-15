@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.kingmarco.myclientmodel.Adapters.StockAdapter;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.StockHolder;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.StockHolder;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.StockType;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.StockObserver;
@@ -35,7 +35,6 @@ public class PromotionFragment extends Fragment implements StockObserver {
         /**Set the promotion adapter*/
         stockAdapter = new StockAdapter(getActivity(),this);
         stockAdapter.setActionId(R.id.action_promotionFragment_to_promotionDetailsFragment);
-        onVariableChange();
     }
 
     @Override

@@ -3,7 +3,6 @@ package com.kingmarco.myclientmodel.Fragments.Login;
 import android.net.Uri;
 import android.os.Bundle;
 
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -18,27 +17,26 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.ClientHolder;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.ClientHolder;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.GlideApp;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.InAppSnackBars;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncAuthDB;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncRealtimeDB;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Static.InAppSnackBars;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFirebase.SyncAuthDB;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFirebase.SyncRealtimeDB;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.SnackBarsInfo;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.ClientObserver;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetFireStoreDB;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
-import com.kingmarco.myclientmodel.POJOs.Chats;
 import com.kingmarco.myclientmodel.POJOs.Clients;
 import com.kingmarco.myclientmodel.R;
 
@@ -202,8 +200,8 @@ public class ClientAccountFragment extends Fragment implements ClientObserver, G
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()){
-                                SyncRealtimeDB syncRealtimeDB = SyncRealtimeDB.getInstance();
-                                syncRealtimeDB.uploadChat(imageUrl,"image");
+                                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("chats/"+client.getMessagingId());
+                                SyncRealtimeDB.uploadChat(databaseReference,imageUrl,"image");
                                 onCompleteFireStoreRequest(SnackBarsInfo.UPDATE_SUCCESS);
                             } else{
                                 onCompleteFireStoreRequest(SnackBarsInfo.DATA_ERROR);

@@ -1,12 +1,11 @@
 package com.kingmarco.myclientmodel.Auxiliary.Interfaces;
 
-import com.kingmarco.myclientmodel.Auxiliary.Enums.SnackBarsInfo;
 import com.kingmarco.myclientmodel.POJOs.Chats;
 import com.kingmarco.myclientmodel.POJOs.Messages;
 
 import java.util.ArrayList;
-import java.util.Map;
 
-public interface GetRealtimeDB {
-    void getSyncRealtimeDB(SnackBarsInfo snackBarsInfo);
+public interface ChatObserver {
+    void onMessagesChange(ArrayList<Messages> arrayList);
+    void onChatChange(Chats chats);
 }

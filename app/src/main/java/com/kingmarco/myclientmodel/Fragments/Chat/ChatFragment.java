@@ -17,26 +17,23 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.kingmarco.myclientmodel.Adapters.MessagesAdapter;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.ClientHolder;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.InAppSnackBars;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.MessagesHolder;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncAuthDB;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncRealtimeDB;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.TimestampDeserializer;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.ChatHolder;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.ClientHolder;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Static.NotificationManager;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFirebase.SyncAuthDB;
+import com.kingmarco.myclientmodel.POJOs.TimestampDeserializer;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.MessagesStatus;
-import com.kingmarco.myclientmodel.Auxiliary.Enums.SnackBarsInfo;
-import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetRealtimeDB;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.ChatObserver;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
+import com.kingmarco.myclientmodel.POJOs.Chats;
 import com.kingmarco.myclientmodel.POJOs.Clients;
 import com.kingmarco.myclientmodel.POJOs.Messages;
 import com.kingmarco.myclientmodel.R;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /**The fragment responsible for show the messages from the firebase*/
-public class ChatFragment extends Fragment implements GetRealtimeDB {
+public class ChatFragment extends Fragment implements ChatObserver {
     private SetLabelName setLabelName;
     private View contentView;
     private ListView lvMessages;
@@ -44,12 +41,10 @@ public class ChatFragment extends Fragment implements GetRealtimeDB {
     private Button btnSent;
     private DatabaseReference databaseReference;
     private MessagesAdapter messagesAdapter;
-    private final Map<String,Object> mapMessages = new HashMap<>();
 
     public ChatFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -115,42 +110,40 @@ public class ChatFragment extends Fragment implements GetRealtimeDB {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        MessagesHolder.addObserver(this);
+    public void onStart() {
+        super.onStart();
+        ChatHolder.addObserver(this);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        MessagesHolder.removeObserver(this);
+        ChatHolder.removeObserver(this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        MessagesHolder.removeObserver(this);
+        ChatHolder.removeObserver(this);
     }
 
     @Override
-    public void getSyncRealtimeDB(ArrayList<Messages> arrayList) {
+    public void onMessagesChange(ArrayList<Messages> arrayList) {
         if(!SyncAuthDB.getInstance().isLogin()){return;}
         if(ClientHolder.getYouClient() == null){return;}
-        mapMessages.clear();
         for (Messages message : arrayList){
             if(message.getSenderId() != ClientHolder.getYouClient().getMessagingId()
                     && message.getStatus() != MessagesStatus.SEEN){
                 message.setStatus(MessagesStatus.SEEN);
-                mapMessages.put(message.getId(),message);
+                NotificationManager.getInstance().deleteMessagesNotification(message.getSenderId());
                 databaseReference.child(message.getId()).setValue(message);
             }
         }
-        databaseReference.updateChildren(mapMessages);
         messagesAdapter.setDatabase(arrayList);
     }
 
     @Override
-    public void getSyncRealtimeDB(SnackBarsInfo snackBarsInfo) {
-        InAppSnackBars.defineSnackBarInfo(snackBarsInfo, contentView, getContext(), getActivity(), false);
+    public void onChatChange(Chats chats) {
+
     }
 }

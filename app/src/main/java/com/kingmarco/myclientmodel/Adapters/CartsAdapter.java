@@ -1,7 +1,6 @@
 package com.kingmarco.myclientmodel.Adapters;
 
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,12 +19,10 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.GlideApp;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.StockHolder;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.StockHolder;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.CartStatus;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.StockType;
 import com.kingmarco.myclientmodel.POJOs.Carts;
-import com.kingmarco.myclientmodel.POJOs.Products;
-import com.kingmarco.myclientmodel.POJOs.Promotions;
 import com.kingmarco.myclientmodel.POJOs.Stock;
 import com.kingmarco.myclientmodel.R;
 
@@ -59,8 +56,7 @@ public class CartsAdapter extends RecyclerView.Adapter<CartsAdapter.ViewHolder>{
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.carts_recicler_item,parent,false);
-        ViewHolder viewHolder = new ViewHolder(view);
-        return viewHolder;
+        return new ViewHolder(view);
     }
 
     @Override
@@ -75,10 +71,7 @@ public class CartsAdapter extends RecyclerView.Adapter<CartsAdapter.ViewHolder>{
 
         if(cart.getPurchasedItemsId() == null){return;}
 
-        iterateOverStock(holder,StockType.PRODUCT,cart,name,hasImage);
-        iterateOverStock(holder,StockType.PROMOTION,cart,name,hasImage);
-
-        holder.txtProductName.setText(name);
+        holder.txtStatus.setText(getSpanishStatus(cart.getStatus()));
 
         String date;
         if(cart.getArrivedDate() == null){
@@ -92,7 +85,10 @@ public class CartsAdapter extends RecyclerView.Adapter<CartsAdapter.ViewHolder>{
         }
         holder.txtDate.setText(date);
 
-        holder.txtStatus.setText(getSpanishStatus(cart.getStatus()));
+        iterateOverStock(holder,StockType.PRODUCT,cart,name,hasImage);
+        iterateOverStock(holder,StockType.PROMOTION,cart,name,hasImage);
+
+        holder.txtProductName.setText(name);
 
         /**Set the button lister to navigate to another fragment, with the details of the parcelable object*/
         holder.cardView.setOnClickListener(new View.OnClickListener() {

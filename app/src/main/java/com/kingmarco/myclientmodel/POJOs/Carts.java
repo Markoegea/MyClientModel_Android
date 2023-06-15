@@ -1,14 +1,6 @@
 package com.kingmarco.myclientmodel.POJOs;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
-import androidx.annotation.NonNull;
-
-import com.google.firebase.Timestamp;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.TimestampDeserializer;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.CartStatus;
-import com.kingmarco.myclientmodel.Auxiliary.Enums.StockType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +9,7 @@ import java.util.Map;
 /**The class cart that is used to organize the information of the cart*/
 public class Carts {
 
-    private Long id;
+    private Integer id;
     private Map<String,ArrayList<Long>> purchasedItemsId;
     private String clientId;
     private int totalPrice;
@@ -34,7 +26,7 @@ public class Carts {
 
     }
 
-    public Carts(Long id,
+    public Carts(Integer id,
                  Map<String, ArrayList<Long>> purchasedItemsId,
                  String clientID,
                  int totalPrice,
@@ -51,11 +43,11 @@ public class Carts {
     }
 
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

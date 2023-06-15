@@ -1,4 +1,4 @@
-package com.kingmarco.myclientmodel.Auxiliary.Classes;
+package com.kingmarco.myclientmodel.Auxiliary.Classes.Static;
 
 import android.content.Context;
 import android.view.Gravity;
@@ -36,6 +36,10 @@ public class InAppSnackBars {
             case DATA_ERROR:
                 InAppSnackBars.showSnackBar(contentView, context, R.color.white, R.color.red,
                         "Hubo un error al subir la informacion, intenta otra vez");
+                break;
+            case CARTS_ERROR:
+                InAppSnackBars.showSnackBar(contentView, context, R.color.white, R.color.red,
+                        "No se puedo cargar tus pedidos, intenta mas tarde");
                 break;
             case EXIST_ERROR:
                 InAppSnackBars.showSnackBar(contentView, context, R.color.white, R.color.red,

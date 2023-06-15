@@ -1,13 +1,5 @@
 package com.kingmarco.myclientmodel.POJOs;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
-import androidx.annotation.NonNull;
-
-import com.google.firebase.Timestamp;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.TimestampDeserializer;
-
 import java.util.ArrayList;
 
 /**The class PromoProduct that is used to organize the information of the PromoProduct and parcel it to other fragments*/

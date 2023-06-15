@@ -1,4 +1,4 @@
-package com.kingmarco.myclientmodel.Auxiliary.Classes;
+package com.kingmarco.myclientmodel.Auxiliary.Classes.Holders;
 
 import com.kingmarco.myclientmodel.Auxiliary.Enums.StockType;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.StockObserver;
@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class StockHolder {
 
@@ -24,8 +26,7 @@ public class StockHolder {
     }
 
     public static ArrayList<Stock> getList(StockType nameList){
-        ArrayList<Stock> parcelables = getStockList(nameList);
-        return new ArrayList<>(parcelables);
+        return getStockList(nameList);
     }
 
     public static Stock getSingleStockItem(StockType nameList, Long id){
@@ -36,6 +37,17 @@ public class StockHolder {
             }
         }
         return null;
+    }
+
+    public static List<Stock> getFilterStockList(ArrayList<Long> stockId, StockType stockType){
+        return getStockList(stockType).stream()
+                .filter(new Predicate<Stock>() {
+                    @Override
+                    public boolean test(Stock stock) {
+                        return stockId.contains(stock.getId());
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
     public static void addInStockList(StockType nameList, Stock item){
@@ -50,8 +62,13 @@ public class StockHolder {
         notifyObservers();
     }
 
+    public static void clearAllStockItems(){
+        stockItems.clear();
+    }
+
     public static void addObserver(StockObserver observer){
         observers.add(observer);
+        notifyObservers();
     }
 
     public static void removeObserver(StockObserver observer){

@@ -12,16 +12,16 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.kingmarco.myclientmodel.Adapters.ImagesAdapter;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.ClientHolder;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.InAppSnackBars;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.StockHolder;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncAuthDB;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFireStoreDB;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.ClientHolder;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Static.InAppSnackBars;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.StockHolder;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFirebase.SyncAuthDB;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFirebase.SyncRealtimeDB;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.SnackBarsInfo;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.StockType;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetFireStoreDB;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetRealtimeDB;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
 import com.kingmarco.myclientmodel.POJOs.Products;
 import com.kingmarco.myclientmodel.R;
@@ -29,7 +29,7 @@ import com.kingmarco.myclientmodel.R;
 import java.text.DecimalFormat;
 
 /** The fragment responsible for show the details of the product*/
-public class ProductDetailsFragment extends Fragment implements GetFireStoreDB {
+public class ProductDetailsFragment extends Fragment implements GetFireStoreDB, GetRealtimeDB {
 
     private SetLabelName setLabelName;
     private View contentView;
@@ -116,7 +116,7 @@ public class ProductDetailsFragment extends Fragment implements GetFireStoreDB {
         String text = edtProductQuantity.getText().toString();
         try{
             int quantity = Integer.parseInt(text);
-            SyncFireStoreDB.uploadCartItemsRequest(product, StockType.PRODUCT,quantity,this,this);
+            SyncRealtimeDB.newCartItemsRequest(product, StockType.PRODUCT,quantity,this,this);
         } catch (NumberFormatException e){
             onCompleteFireStoreRequest(SnackBarsInfo.INCOMPLETE_INFO_ERROR);
         }
@@ -124,6 +124,11 @@ public class ProductDetailsFragment extends Fragment implements GetFireStoreDB {
 
     @Override
     public void onCompleteFireStoreRequest(SnackBarsInfo snackBarsInfo) {
+        InAppSnackBars.defineSnackBarInfo(snackBarsInfo,contentView,getContext(),getActivity(),false);
+    }
+
+    @Override
+    public void getSyncRealtimeDB(SnackBarsInfo snackBarsInfo) {
         InAppSnackBars.defineSnackBarInfo(snackBarsInfo,contentView,getContext(),getActivity(),false);
     }
 }
