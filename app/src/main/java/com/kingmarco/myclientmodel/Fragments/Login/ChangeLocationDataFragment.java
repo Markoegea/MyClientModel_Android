@@ -48,6 +48,7 @@ import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.ClientHolder;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.Static.InAppSnackBars;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.SnackBarsInfo;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetFireStoreDB;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.ProgressBarBehavior;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
 import com.kingmarco.myclientmodel.POJOs.Clients;
 import com.kingmarco.myclientmodel.R;
@@ -66,6 +67,7 @@ public class ChangeLocationDataFragment extends Fragment implements OnMapReadyCa
     private static final int MAPS_LAYOUT = 1;
     private static final int WRITE_LAYOUT = 2;
     private SetLabelName setLabelName;
+    private ProgressBarBehavior progressBarBehavior;
     private Clients client;
     private RelativeLayout mapsLayout;
     private LinearLayout writeLayout;
@@ -100,6 +102,7 @@ public class ChangeLocationDataFragment extends Fragment implements OnMapReadyCa
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setLabelName = (SetLabelName) getContext();
+        progressBarBehavior = (ProgressBarBehavior) getContext();
         client = ClientHolder.getYouClient();
     }
 
@@ -219,6 +222,7 @@ public class ChangeLocationDataFragment extends Fragment implements OnMapReadyCa
     }
 
     private void uploadClient(){
+        progressBarBehavior.startProgressBar();
         DocumentReference documentReference = clientDB.document(client.getId());
         documentReference.set(client).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
@@ -362,5 +366,6 @@ public class ChangeLocationDataFragment extends Fragment implements OnMapReadyCa
     @Override
     public void onCompleteFireStoreRequest(SnackBarsInfo snackBarsInfo) {
         InAppSnackBars.defineSnackBarInfo(snackBarsInfo,contentView,getContext(),getActivity(),true);
+        progressBarBehavior.stopProgressBar();
     }
 }

@@ -21,13 +21,17 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="30dp"
+                    android:layout_margin="10dp"
+                    android:background="@drawable/circle_shadow_shape"
+                    android:elevation="8dp"
                     android:orientation="vertical"
                     android:id="@+id/llOldLogin">
                     <EditText
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
                         android:hint="Email Actual"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
                         android:layout_marginBottom="20dp"
                         android:inputType="textEmailAddress"
                         android:id="@+id/edtOldEmail"/>
@@ -35,6 +39,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
                         android:hint="Contraseña Actual"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:layout_marginBottom="20dp"
                         android:inputType="textPassword"
                         android:id="@+id/edtOldPassword"/>
                 </LinearLayout>
@@ -76,7 +83,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/radioLogin"
-                        android:layout_margin="30dp"
+                        android:layout_marginTop="30dp"
+                        android:layout_marginBottom="30dp"
+                        android:background="@drawable/circle_shadow_shape"
+                        android:elevation="8dp"
                         android:orientation="vertical"
                         android:visibility="gone"
                         android:id="@+id/llEmail">
@@ -84,6 +94,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="50dp"
                             android:hint="Email"
+                            android:layout_marginStart="20dp"
+                            android:layout_marginEnd="20dp"
                             android:layout_marginBottom="20dp"
                             android:inputType="textEmailAddress"
                             android:id="@+id/edtEmail"/>
@@ -91,6 +103,9 @@
                             android:layout_width="match_parent"
                             android:layout_height="50dp"
                             android:hint="Confirmacion Email"
+                            android:layout_marginStart="20dp"
+                            android:layout_marginEnd="20dp"
+                            android:layout_marginBottom="20dp"
                             android:inputType="textEmailAddress"
                             android:id="@+id/edtReEmail"/>
                     </LinearLayout>
@@ -100,7 +115,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/radioLogin"
-                        android:layout_margin="30dp"
+                        android:layout_marginTop="30dp"
+                        android:layout_marginBottom="30dp"
+                        android:background="@drawable/circle_shadow_shape"
+                        android:elevation="8dp"
                         android:orientation="vertical"
                         android:visibility="gone"
                         android:id="@+id/llPassword">
@@ -108,6 +126,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="50dp"
                             android:hint="Contraseña"
+                            android:layout_marginStart="20dp"
+                            android:layout_marginEnd="20dp"
                             android:layout_marginBottom="20dp"
                             android:inputType="textPassword"
                             android:id="@+id/edtPassword"/>
@@ -115,20 +135,33 @@
                             android:layout_width="match_parent"
                             android:layout_height="50dp"
                             android:hint="Confirmacion Contraseña"
+                            android:layout_marginStart="20dp"
+                            android:layout_marginEnd="20dp"
+                            android:layout_marginBottom="20dp"
                             android:inputType="textPassword"
                             android:id="@+id/edtRePassword"/>
                     </LinearLayout>
                 </RelativeLayout>
             </RelativeLayout>
         </ScrollView>
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_upload"
-            android:backgroundTint="@color/purple_500"
-            android:layout_margin="35dp"
+            android:background="@drawable/circle_shadow_shape"
+            android:layout_marginBottom="10dp"
+            android:elevation="8dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp"
+            android:layout_marginTop="6dp"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:id="@+id/btnUpdate"/>
+            android:layout_centerHorizontal="true">
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_upload"
+                android:backgroundTint="@color/purple_500"
+                android:layout_margin="10dp"
+                android:id="@+id/btnUpdate"/>
+        </RelativeLayout>
     </RelativeLayout>
 </FrameLayout>

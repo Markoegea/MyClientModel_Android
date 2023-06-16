@@ -136,18 +136,24 @@ public class SyncAuthDB {
 
     public void removeListenerClient(){
         if(listenerRegistration == null){return;}
+        ClientHolder.setClientNull();
         listenerRegistration.remove();
     }
 
     private ListenerRegistration newListenerClient(){
-        if (!isLogin()){return null;}
+        if (!isLogin()){
+            return null;
+        }
         String id = firebaseAuth.getCurrentUser().getUid();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         return db.collection("Clientes").document(id).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
                 if (!isLogin()){return;}
-                if (value == null){return;}
+                if (value == null){
+                    SyncAuthDB.getInstance().logOut();
+                    return;
+                }
                 Clients clients = value.toObject(Clients.class);
                 ClientHolder.setYouClient(clients);
             }

@@ -30,7 +30,9 @@ public class ChatHolder {
         return myChat;
     }
 
-    public static void setChatNull(){myChat = null;}
+    public static void setChatNull(){
+        myChat = null;
+    }
 
     public static void addSingleMessage(Messages messages){
         myMessages.add(messages);

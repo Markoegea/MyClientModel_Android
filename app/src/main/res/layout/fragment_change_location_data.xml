@@ -68,67 +68,105 @@
                         android:focusable="false"
                         android:focusableInTouchMode="false"
                         android:id="@+id/mpClient"/>
-                    <EditText
+
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Direccion"
-                        android:textSize="20sp"
-                        android:textColor="@color/black"
+                        android:background="@drawable/circle_shadow_shape"
+                        android:layout_marginBottom="10dp"
                         android:layout_below="@id/txtTitle1"
-                        android:layout_margin="10dp"
-                        android:id="@+id/edtLocation"/>
+                        android:layout_margin="5dp"
+                        android:elevation="8dp">
+                        <EditText
+                            android:id="@+id/edtLocation"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Direccion"
+                            android:textColor="@color/black"
+                            android:textSize="20sp" />
+                    </LinearLayout>
                 </RelativeLayout>
                 <!--Manual Directions!-->
                 <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="30dp"
-                        android:layout_marginEnd="30dp"
+                        android:layout_margin="30dp"
                         android:visibility="visible"
                         android:orientation="vertical"
                         android:layout_below="@id/radioMaps"
                         android:id="@+id/llWriteDirections">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/circle_shadow_shape"
+                        android:layout_marginBottom="10dp"
+                        android:elevation="8dp"
+                        android:layout_marginStart="6dp"
+                        android:layout_marginEnd="6dp"
+                        android:layout_marginTop="6dp">
                         <EditText
                             android:id="@+id/edtCountry"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="30dp"
-                            android:layout_marginEnd="30dp"
                             android:hint="Pais"
                             android:textSize="25sp" />
+                    </LinearLayout>
 
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/circle_shadow_shape"
+                        android:layout_marginBottom="10dp"
+                        android:elevation="8dp"
+                        android:layout_marginStart="6dp"
+                        android:layout_marginEnd="6dp"
+                        android:layout_marginTop="6dp">
                         <EditText
                             android:id="@+id/edtCity"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_below="@id/edtCountry"
-                            android:layout_marginStart="30dp"
-                            android:layout_marginTop="20dp"
-                            android:layout_marginEnd="30dp"
                             android:hint="Ciudad"
                             android:textSize="25sp" />
+                    </LinearLayout>
 
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/circle_shadow_shape"
+                        android:layout_marginBottom="10dp"
+                        android:elevation="8dp"
+                        android:layout_marginStart="6dp"
+                        android:layout_marginEnd="6dp"
+                        android:layout_marginTop="6dp">
                         <EditText
                             android:id="@+id/edtAddress"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_below="@id/edtCity"
-                            android:layout_marginStart="30dp"
-                            android:layout_marginTop="20dp"
-                            android:layout_marginEnd="30dp"
                             android:hint="Direccion"
                             android:textSize="25sp" />
                     </LinearLayout>
+
+                    </LinearLayout>
             </RelativeLayout>
         <!--ButtonLayout!-->
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_upload"
-            android:backgroundTint="@color/purple_500"
-            android:layout_margin="35dp"
-            android:layout_centerHorizontal="true"
+            android:background="@drawable/circle_shadow_shape"
+            android:layout_marginBottom="10dp"
+            android:elevation="8dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp"
+            android:layout_marginTop="6dp"
             android:layout_alignParentBottom="true"
-            android:id="@+id/btnUpdate"/>
+            android:layout_centerHorizontal="true">
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_upload"
+                android:backgroundTint="@color/purple_500"
+                android:layout_margin="5dp"
+                android:id="@+id/btnUpdate"/>
+        </RelativeLayout>
     </RelativeLayout>
 </FrameLayout>

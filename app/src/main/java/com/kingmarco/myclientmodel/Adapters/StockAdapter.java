@@ -21,6 +21,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.GlideApp;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Static.FragmentAnimation;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.Static.InAppSnackBars;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFirebase.SyncRealtimeDB;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.CartStatus;
@@ -105,7 +106,7 @@ public class StockAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     Bundle bundle = new Bundle();
                     bundle.putLong("stock",stock.getId());
                     NavController nav = NavHostFragment.findNavController(fragment);
-                    nav.navigate(actionId,bundle);
+                    nav.navigate(actionId,bundle, FragmentAnimation.navigateBehavior());
                 }
             });
         }

@@ -17,17 +17,20 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Static.FragmentAnimation;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.Static.InAppSnackBars;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFirebase.SyncAuthDB;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.SnackBarsInfo;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetAuthDB;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetFireStoreDB;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.ProgressBarBehavior;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
 import com.kingmarco.myclientmodel.R;
 
 /**This fragment is the responsible to login the client or send him to the register fragment*/
 public class LoginFragment extends Fragment implements GetAuthDB, GetFireStoreDB {
     private SetLabelName setLabelName;
+    private ProgressBarBehavior progressBarBehavior;
     private Button btnLogin, btnRegister;
     private EditText edtEmail, edtPassword;
     private View contentView;
@@ -39,6 +42,7 @@ public class LoginFragment extends Fragment implements GetAuthDB, GetFireStoreDB
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setLabelName = (SetLabelName) getContext();
+        progressBarBehavior = (ProgressBarBehavior) getContext();
     }
 
     @Override
@@ -65,6 +69,7 @@ public class LoginFragment extends Fragment implements GetAuthDB, GetFireStoreDB
             public void onClick(View v) {
                 String email = edtEmail.getText().toString();
                 String password = edtPassword.getText().toString();
+                progressBarBehavior.startProgressBar();
                 if (!sanitizeData(email,password)){
                     onCompleteFireStoreRequest(SnackBarsInfo.INCOMPLETE_INFO_ERROR);
                     return;
@@ -77,7 +82,7 @@ public class LoginFragment extends Fragment implements GetAuthDB, GetFireStoreDB
             @Override
             public void onClick(View v) {
                 NavController navController = NavHostFragment.findNavController(LoginFragment.this);
-                navController.navigate(R.id.action_loginFragment_to_registerClientFragment);
+                navController.navigate(R.id.registerClientFragment,null, FragmentAnimation.navigateBehavior());
             }
         });
     }
@@ -115,7 +120,7 @@ public class LoginFragment extends Fragment implements GetAuthDB, GetFireStoreDB
                 if (task.isSuccessful()){
                     if (task.getResult().exists()){
                         NavController navController = NavHostFragment.findNavController(LoginFragment.this);
-                        navController.navigate(R.id.action_loginFragment_to_clientAccountFragment);
+                        navController.navigate(R.id.clientAccountFragment,null,FragmentAnimation.navigateBehavior());
                         onCompleteFireStoreRequest(SnackBarsInfo.LOGIN_SUCCESS);
                     } else{
                         SyncAuthDB.getInstance().logOut();
@@ -132,5 +137,6 @@ public class LoginFragment extends Fragment implements GetAuthDB, GetFireStoreDB
     @Override
     public void onCompleteFireStoreRequest(SnackBarsInfo snackBarsInfo) {
         InAppSnackBars.defineSnackBarInfo(snackBarsInfo,contentView,getContext(),getActivity(),false);
+        progressBarBehavior.stopProgressBar();
     }
 }

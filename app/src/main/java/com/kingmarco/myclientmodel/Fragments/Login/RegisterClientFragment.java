@@ -34,6 +34,7 @@ import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFirebase.SyncAuthDB;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.SnackBarsInfo;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetAuthDB;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetFireStoreDB;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.ProgressBarBehavior;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
 import com.kingmarco.myclientmodel.POJOs.Clients;
 import com.kingmarco.myclientmodel.R;
@@ -47,6 +48,7 @@ public class RegisterClientFragment extends Fragment implements GetFireStoreDB, 
     private final FirebaseStorage storage = FirebaseStorage.getInstance();
     private View contentView;
     private SetLabelName setLabelName;
+    private ProgressBarBehavior progressBarBehavior;
     private ImageView ivClient;
     private FloatingActionButton btnRegister;
     private Button btnUploadImage;
@@ -79,6 +81,7 @@ public class RegisterClientFragment extends Fragment implements GetFireStoreDB, 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setLabelName = (SetLabelName) getContext();
+        progressBarBehavior = (ProgressBarBehavior) getContext();
     }
 
     @Override
@@ -127,6 +130,7 @@ public class RegisterClientFragment extends Fragment implements GetFireStoreDB, 
             getActivity().onBackPressed();
             return;
         }
+        progressBarBehavior.startProgressBar();
         if (!sanitizeData()) {
             onCompleteFireStoreRequest(SnackBarsInfo.INCOMPLETE_INFO_ERROR);
             return;
@@ -250,5 +254,6 @@ public class RegisterClientFragment extends Fragment implements GetFireStoreDB, 
     @Override
     public void onCompleteFireStoreRequest(SnackBarsInfo snackBarsInfo) {
         InAppSnackBars.defineSnackBarInfo(snackBarsInfo,contentView,getContext(),getActivity(),true);
+        progressBarBehavior.stopProgressBar();
     }
 }

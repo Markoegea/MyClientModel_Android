@@ -45,11 +45,15 @@
                         android:id="@+id/txtTitle3"/>
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/circle_shadow_shape"
+                        android:layout_marginStart="6dp"
+                        android:layout_marginEnd="6dp"
+                        android:elevation="8dp">
                         <EditText
                             android:layout_width="wrap_content"
                             android:layout_height="50dp"
-                            android:hint="Numero de documento"
+                            android:hint="N# Documento"
                             android:inputType="number"
                             android:id="@+id/edtDocumentId"/>
                         <Spinner
@@ -67,24 +71,42 @@
                         android:textStyle="bold"
                         android:layout_marginTop="25dp"
                         android:id="@+id/txtTitle4"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:background="@drawable/circle_shadow_shape"
+                        android:elevation="8dp"
+                        android:orientation="vertical"
+                        android:layout_marginStart="6dp"
+                        android:layout_marginEnd="6dp">
                         <EditText
                             android:layout_width="match_parent"
                             android:layout_height="50dp"
                             android:hint="Nombre"
                             android:inputType="text"
                             android:id="@+id/edtName"/>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Apellidos:"
-                            android:textSize="15sp"
-                            android:textStyle="bold"
-                            android:layout_marginTop="25dp"
-                            android:id="@+id/txtTitle5"/>
+                    </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Apellidos:"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="25dp"
+                        android:id="@+id/txtTitle5"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/circle_shadow_shape"
+                        android:elevation="8dp"
+                        android:orientation="vertical"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginStart="6dp"
+                        android:layout_marginEnd="6dp">
                         <EditText
                             android:layout_width="match_parent"
                             android:layout_height="50dp"
@@ -92,6 +114,7 @@
                             android:inputType="text"
                             android:id="@+id/edtLastName"/>
                     </LinearLayout>
+                </LinearLayout>
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -104,12 +127,21 @@
                             android:textStyle="bold"
                             android:layout_marginTop="25dp"
                             android:id="@+id/txtTitle6"/>
-                        <EditText
+                        <LinearLayout
                             android:layout_width="wrap_content"
-                            android:layout_height="50dp"
-                            android:hint="Edad"
-                            android:inputType="number"
-                            android:id="@+id/edtAge"/>
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/circle_shadow_shape"
+                            android:elevation="8dp"
+                            android:layout_marginStart="6dp"
+                            android:layout_marginEnd="6dp"
+                            android:id="@+id/ll3">
+                            <EditText
+                                android:layout_width="wrap_content"
+                                android:layout_height="50dp"
+                                android:hint="Edad"
+                                android:inputType="number"
+                                android:id="@+id/edtAge"/>
+                        </LinearLayout>
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -118,24 +150,44 @@
                             android:textStyle="bold"
                             android:layout_marginTop="25dp"
                             android:id="@+id/txtTitle7"/>
-                        <EditText
+                        <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="50dp"
-                            android:hint="Numero de celular"
-                            android:inputType="phone"
-                            android:id="@+id/edtPhoneNumber"/>
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/circle_shadow_shape"
+                            android:layout_marginBottom="15dp"
+                            android:elevation="8dp"
+                            android:layout_marginStart="6dp"
+                            android:layout_marginEnd="6dp"
+                            android:id="@+id/ll4">
+                            <EditText
+                                android:layout_width="match_parent"
+                                android:layout_height="50dp"
+                                android:hint="Numero de celular"
+                                android:inputType="phone"
+                                android:id="@+id/edtPhoneNumber"/>
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
             </RelativeLayout>
         </ScrollView>
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_upload"
-            android:backgroundTint="@color/purple_500"
-            android:layout_margin="35dp"
+            android:background="@drawable/circle_shadow_shape"
+            android:layout_marginBottom="10dp"
+            android:elevation="8dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp"
+            android:layout_marginTop="6dp"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:id="@+id/btnUpdate"/>
+            android:layout_centerHorizontal="true">
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_upload"
+                android:backgroundTint="@color/purple_500"
+                android:layout_margin="5dp"
+                android:id="@+id/btnUpdate"/>
+        </RelativeLayout>
     </RelativeLayout>
 </FrameLayout>

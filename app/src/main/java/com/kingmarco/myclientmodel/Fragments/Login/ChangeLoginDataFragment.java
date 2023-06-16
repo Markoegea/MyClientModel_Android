@@ -19,6 +19,7 @@ import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFirebase.SyncAuthDB;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.SnackBarsInfo;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetAuthDB;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetFireStoreDB;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.ProgressBarBehavior;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
 import com.kingmarco.myclientmodel.R;
 
@@ -26,6 +27,7 @@ import com.kingmarco.myclientmodel.R;
 public class ChangeLoginDataFragment extends Fragment implements GetFireStoreDB, GetAuthDB {
 
     private SetLabelName setLabelName;
+    private ProgressBarBehavior progressBarBehavior;
     //Login View
     private LinearLayout emailLayout, passwordLayout;
     private RadioGroup radioLogin;
@@ -42,6 +44,7 @@ public class ChangeLoginDataFragment extends Fragment implements GetFireStoreDB,
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setLabelName = (SetLabelName) getContext();
+        progressBarBehavior = (ProgressBarBehavior) getContext();
     }
 
     @Override
@@ -101,6 +104,7 @@ public class ChangeLoginDataFragment extends Fragment implements GetFireStoreDB,
     /**If everything is correct, update the email of the client*/
     private void onEmailButtonClick(View view){
         if(!checkData()){return;}
+        progressBarBehavior.startProgressBar();
         if(edtEmail.getText().toString().isEmpty() || edtReEmail.getText().toString().isEmpty()){
             onCompleteFireStoreRequest(SnackBarsInfo.INCOMPLETE_INFO_ERROR);
             return;
@@ -121,6 +125,7 @@ public class ChangeLoginDataFragment extends Fragment implements GetFireStoreDB,
         if(!checkData()){
             return;
         }
+        progressBarBehavior.startProgressBar();
         if(edtPassword.getText().toString().isEmpty() || edtRePassword.getText().toString().isEmpty()){
             onCompleteFireStoreRequest(SnackBarsInfo.INCOMPLETE_INFO_ERROR);
             return;
@@ -163,5 +168,6 @@ public class ChangeLoginDataFragment extends Fragment implements GetFireStoreDB,
     @Override
     public void onCompleteFireStoreRequest(SnackBarsInfo snackBarsInfo) {
         InAppSnackBars.defineSnackBarInfo(snackBarsInfo,contentView,getContext(),getActivity(),true);
+        progressBarBehavior.stopProgressBar();
     }
 }

@@ -20,6 +20,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.GlideApp;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.StockHolder;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Static.FragmentAnimation;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.CartStatus;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.StockType;
 import com.kingmarco.myclientmodel.POJOs.Carts;
@@ -27,12 +28,13 @@ import com.kingmarco.myclientmodel.POJOs.Stock;
 import com.kingmarco.myclientmodel.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**Adapter to the Recycler View in the Cart fragment*/
 public class CartsAdapter extends RecyclerView.Adapter<CartsAdapter.ViewHolder>{
 
     private final FirebaseStorage storage = FirebaseStorage.getInstance();
-    private ArrayList<Carts> database = new ArrayList<>();
+    private List<Carts> database;
     private FragmentActivity fragmentActivity;
     private Fragment fragment;
     private int actionId;
@@ -43,7 +45,7 @@ public class CartsAdapter extends RecyclerView.Adapter<CartsAdapter.ViewHolder>{
         this.actionId = -1;
     }
 
-    public void setDatabase(ArrayList<Carts> database) {
+    public void setDatabase(List<Carts> database) {
         this.database = database;
         notifyDataSetChanged();
     }
@@ -98,7 +100,7 @@ public class CartsAdapter extends RecyclerView.Adapter<CartsAdapter.ViewHolder>{
                 Bundle data = new Bundle();
                 data.putLong("cartID",cart.getId());
                 data.putString("cartName",name.toString());
-                nav.navigate(actionId,data);
+                nav.navigate(actionId,data, FragmentAnimation.navigateBehavior());
             }
         });
     }

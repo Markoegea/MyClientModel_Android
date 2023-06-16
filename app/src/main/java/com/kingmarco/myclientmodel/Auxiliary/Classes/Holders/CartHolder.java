@@ -8,6 +8,8 @@ import com.kingmarco.myclientmodel.POJOs.Carts;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class CartHolder {
 
@@ -16,6 +18,21 @@ public class CartHolder {
 
     public static ArrayList<Carts> getCartList(){
         return new ArrayList<>(cartList);
+    }
+
+    public static List<Carts> getCartList(CartStatus deliveryStatus){
+        return cartList.stream().filter(new Predicate<Carts>() {
+            @Override
+            public boolean test(Carts carts) {
+                if (deliveryStatus == null){
+                    return true;
+                }
+                if (deliveryStatus == CartStatus.ALL){
+                    return true;
+                }
+                return carts.getStatus() == deliveryStatus;
+            }
+        }).collect(Collectors.toList());
     }
 
     public static Carts getSingleCartItem(Long id){

@@ -17,6 +17,7 @@ import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.ClientHolder;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.Static.InAppSnackBars;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.StockHolder;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFirebase.SyncRealtimeDB;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.ProgressBarBehavior;
 import com.kingmarco.myclientmodel.POJOs.TimestampDeserializer;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.CartStatus;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.SnackBarsInfo;
@@ -37,6 +38,7 @@ import java.util.ArrayList;
 public class CartDetailsFragment extends Fragment implements GetRealtimeDB, CartObserver {
 
     private SetLabelName setLabelName;
+    private ProgressBarBehavior progressBarBehavior;
     private Carts cart;
     private View contentView;
     private TextView txtCartStatus, txtCartOwner, txtCartProducts,txtCartDateType, txtDate
@@ -54,10 +56,10 @@ public class CartDetailsFragment extends Fragment implements GetRealtimeDB, Cart
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setLabelName = (SetLabelName) getContext();
+        progressBarBehavior = (ProgressBarBehavior) getContext();
         if (getArguments() == null){return;}
         long cartID = getArguments().getLong("cartID");
         cart = CartHolder.getSingleCartItem(cartID);
-
         stockAdapter = new StockAdapter(getActivity(),this);
         stockAdapter.setCarts(cart);
     }
@@ -67,7 +69,6 @@ public class CartDetailsFragment extends Fragment implements GetRealtimeDB, Cart
                              Bundle savedInstanceState) {
         contentView = inflater.inflate(R.layout.fragment_cart_details, container, false);
         setViews(contentView);
-        onVariableChange(null);
         setLabelName.setLabelName("Detalles Compra");
         // Inflate the layout for this fragment
         return contentView;
@@ -112,6 +113,7 @@ public class CartDetailsFragment extends Fragment implements GetRealtimeDB, Cart
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                progressBarBehavior.startProgressBar();
                 SyncRealtimeDB.deleteCartRequest(cart,CartDetailsFragment.this);
                 if(getActivity() == null){return;}
                 getActivity().onBackPressed();
@@ -120,6 +122,7 @@ public class CartDetailsFragment extends Fragment implements GetRealtimeDB, Cart
         btnUpload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                progressBarBehavior.startProgressBar();
                 cart.setStatus(CartStatus.SENT);
                 cart.setPurchasedDate(TimestampDeserializer.generateNewTimestamp());
                 SyncRealtimeDB.updateCartRequest(cart,CartDetailsFragment.this);
@@ -252,6 +255,7 @@ public class CartDetailsFragment extends Fragment implements GetRealtimeDB, Cart
     public void onVariableChange(ArrayList<Carts> carts) {
         if (isEmptyCart()){
             CartHolder.removeObserver(this);
+            progressBarBehavior.startProgressBar();
             SyncRealtimeDB.deleteCartRequest(cart,CartDetailsFragment.this);
             if(getActivity() == null){return;}
             getActivity().onBackPressed();
@@ -265,5 +269,6 @@ public class CartDetailsFragment extends Fragment implements GetRealtimeDB, Cart
     @Override
     public void getSyncRealtimeDB(SnackBarsInfo snackBarsInfo) {
         InAppSnackBars.defineSnackBarInfo(snackBarsInfo,contentView,getContext(),getActivity(),false);
+        progressBarBehavior.stopProgressBar();
     }
 }

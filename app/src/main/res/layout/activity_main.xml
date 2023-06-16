@@ -12,7 +12,10 @@
         <androidx.appcompat.widget.Toolbar
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/teal_700"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginStart="5dp"
+            android:background="@drawable/toolbar_cloud_shape"
             app:titleTextColor="@color/white"
             android:id="@+id/tbActivity"/>
         <fragment
@@ -24,6 +27,13 @@
             android:layout_below="@id/tbActivity"
             android:layout_marginBottom="0dp"
             android:id="@+id/fragmentContainerView"/>
+        <ProgressBar
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_centerInParent="true"
+            style="@style/IndeterminateCircleProgressBar"
+            android:visibility="gone"
+            android:id="@+id/progressBar"/>
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -26,6 +26,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.CartHolder;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.ChatHolder;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.ClientHolder;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Static.FragmentAnimation;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.Static.InAppSnackBars;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.Static.NotificationManager;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.StockHolder;
@@ -37,14 +38,15 @@ import com.kingmarco.myclientmodel.Auxiliary.Enums.StockType;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.ClientObserver;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetAuthDB;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetRealtimeDB;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.ProgressBarBehavior;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
 import com.kingmarco.myclientmodel.POJOs.Clients;
 import com.kingmarco.myclientmodel.R;
 
 
-//TODO: ANIMS, PROGRESS BAR AND SEARCH BAR
+//TODO: The email field in the client and employee
 public class MainActivity extends AppCompatActivity implements SetLabelName, GetAuthDB, ClientObserver,
-        GetRealtimeDB {
+        GetRealtimeDB, ProgressBarBehavior {
 
     public final int NAVIGATION_DISABLE = 0;
     public final int NAVIGATION_ENABLE = 1;
@@ -66,6 +68,9 @@ public class MainActivity extends AppCompatActivity implements SetLabelName, Get
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        navOptions = FragmentAnimation.navigateBehavior();
+
+        progressBar = findViewById(R.id.progressBar);
         bottomNavigationView = findViewById(R.id.nav_view);
         tbActivity = findViewById(R.id.tbActivity);
         setSupportActionBar(tbActivity);
@@ -81,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements SetLabelName, Get
 
         ClientHolder.addObserver(this);
         SyncAuthDB.getInstance().addListenerAuth(this);
+
         productListener = SyncFireStoreDB.newStockListenerRegistration(StockType.PRODUCT,"Productos");
         promotionListener = SyncFireStoreDB.newStockListenerRegistration(StockType.PROMOTION,"Promociones");
 
@@ -118,18 +124,18 @@ public class MainActivity extends AppCompatActivity implements SetLabelName, Get
 
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         if(item.getItemId() == R.id.homeFragment){
-            navController.navigate(R.id.homeFragment);
+            navController.navigate(R.id.homeFragment,null,navOptions);
         } else if (item.getItemId() == R.id.promotionFragment){
-            navController.navigate(R.id.promotionFragment);
+            navController.navigate(R.id.promotionFragment,null,navOptions);
         } else if (item.getItemId() == R.id.chatFragment){
-            navController.navigate(R.id.chatFragment);
+            navController.navigate(R.id.chatFragment,null,navOptions);
         } else if (item.getItemId() == R.id.cartFragment){
-            navController.navigate(R.id.cartFragment);
+            navController.navigate(R.id.cartFragment,null,navOptions);
         } else if (item.getItemId() == R.id.loginFragment){
             if (SyncAuthDB.getInstance().isLogin()){
-                navController.navigate(R.id.clientAccountFragment);
+                navController.navigate(R.id.clientAccountFragment,null,navOptions);
             } else{
-                navController.navigate(R.id.loginFragment);
+                navController.navigate(R.id.loginFragment,null,navOptions);
             }
         }
         return true;
@@ -173,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements SetLabelName, Get
         if (navigateTo == 0) {
             return;
         }
-        navController.navigate(navigateTo);
+        navController.navigate(navigateTo,null,navOptions);
     }
 
     /**Return to the previous fragment, erasing the actual fragment ot the stack*/
@@ -219,33 +225,29 @@ public class MainActivity extends AppCompatActivity implements SetLabelName, Get
         CartHolder.clearCartList();
         SyncRealtimeDB.stopListening(chatReference, chatListener);
         SyncRealtimeDB.stopListening(cartReference, cartListener);
+        chatReference = null;
+        chatListener = null;
+        cartReference = null;
+        cartListener = null;
     }
 
     private void startListeners(Clients client){
-        setVariablesDatabase(client);
-        SyncRealtimeDB.startListening(chatReference,chatListener);
-        SyncRealtimeDB.startListening(cartReference,cartListener);
-    }
-
-    private void setVariablesDatabase(Clients client){
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         if (chatReference == null || chatListener == null){
             chatReference = firebaseDatabase.getReference("chats/"+client.getMessagingId());
             chatListener = SyncRealtimeDB.newChatListener(chatReference,this);
+            SyncRealtimeDB.startListening(chatReference,chatListener);
         }
         if (cartReference == null || cartListener == null){
             cartReference = firebaseDatabase.getReference("Carritos/"+client.getId());
             cartListener = SyncRealtimeDB.newCartListener(this);
+            SyncRealtimeDB.startListening(cartReference,cartListener);
         }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        stopListeners();
-        ClientHolder.removeObserver(this);
-        SyncAuthDB.getInstance().removeListenerClient();
-        SyncAuthDB.getInstance().removeListenerAuth(this);
         if (productListener != null ){
             productListener.remove();
             productListener = null;
@@ -254,6 +256,8 @@ public class MainActivity extends AppCompatActivity implements SetLabelName, Get
             promotionListener.remove();
             promotionListener = null;
         }
+        ClientHolder.removeObserver(this);
+        SyncAuthDB.getInstance().removeListenerAuth(this);
     }
 
     @Override
@@ -262,7 +266,6 @@ public class MainActivity extends AppCompatActivity implements SetLabelName, Get
             stopListeners();
             return;
         }
-        stopListeners();
         startListeners(client);
     }
 
@@ -279,5 +282,21 @@ public class MainActivity extends AppCompatActivity implements SetLabelName, Get
     @Override
     public void getSyncRealtimeDB(SnackBarsInfo snackBarsInfo) {
         InAppSnackBars.defineSnackBarInfo(snackBarsInfo,findViewById(R.id.fragmentContainerView),this,this,false);
+    }
+
+    @Override
+    public void startProgressBar() {
+        if (fragment == null || progressBar == null){return;}
+        fragment.setVisibility(View.GONE);
+        progressBar.setVisibility(View.VISIBLE);
+        progressBar.setIndeterminate(true);
+    }
+
+    @Override
+    public void stopProgressBar() {
+        if (fragment == null || progressBar == null){return;}
+        fragment.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.GONE);
+        progressBar.setIndeterminate(false);
     }
 }

@@ -22,6 +22,7 @@ import com.kingmarco.myclientmodel.Auxiliary.Enums.SnackBarsInfo;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.StockType;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetFireStoreDB;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetRealtimeDB;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.ProgressBarBehavior;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
 import com.kingmarco.myclientmodel.POJOs.Products;
 import com.kingmarco.myclientmodel.R;
@@ -29,9 +30,10 @@ import com.kingmarco.myclientmodel.R;
 import java.text.DecimalFormat;
 
 /** The fragment responsible for show the details of the product*/
-public class ProductDetailsFragment extends Fragment implements GetFireStoreDB, GetRealtimeDB {
+public class ProductDetailsFragment extends Fragment implements GetRealtimeDB {
 
     private SetLabelName setLabelName;
+    private ProgressBarBehavior progressBarBehavior;
     private View contentView;
     private ViewPager viewPager;
     private TextView txtProductName, txtProductCategory, txtProductPrice,
@@ -49,6 +51,7 @@ public class ProductDetailsFragment extends Fragment implements GetFireStoreDB, 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setLabelName = (SetLabelName) getContext();
+        progressBarBehavior = (ProgressBarBehavior) getContext();
         Bundle productData = getArguments();
         if (productData == null) {return;}
         long stockId = productData.getLong("stock");
@@ -99,12 +102,13 @@ public class ProductDetailsFragment extends Fragment implements GetFireStoreDB, 
         cvAddToCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                progressBarBehavior.startProgressBar();
                 if (!SyncAuthDB.getInstance().isLogin()){
-                    onCompleteFireStoreRequest(SnackBarsInfo.LOGIN_ERROR);
+                    getSyncRealtimeDB(SnackBarsInfo.LOGIN_ERROR);
                     return;
                 }
                 if (ClientHolder.getYouClient() == null){
-                    onCompleteFireStoreRequest(SnackBarsInfo.DISABLE_ERROR);
+                    getSyncRealtimeDB(SnackBarsInfo.DISABLE_ERROR);
                     return;
                 }
                 addToCart();
@@ -118,17 +122,13 @@ public class ProductDetailsFragment extends Fragment implements GetFireStoreDB, 
             int quantity = Integer.parseInt(text);
             SyncRealtimeDB.newCartItemsRequest(product, StockType.PRODUCT,quantity,this,this);
         } catch (NumberFormatException e){
-            onCompleteFireStoreRequest(SnackBarsInfo.INCOMPLETE_INFO_ERROR);
+            getSyncRealtimeDB(SnackBarsInfo.INCOMPLETE_INFO_ERROR);
         }
-    }
-
-    @Override
-    public void onCompleteFireStoreRequest(SnackBarsInfo snackBarsInfo) {
-        InAppSnackBars.defineSnackBarInfo(snackBarsInfo,contentView,getContext(),getActivity(),false);
     }
 
     @Override
     public void getSyncRealtimeDB(SnackBarsInfo snackBarsInfo) {
         InAppSnackBars.defineSnackBarInfo(snackBarsInfo,contentView,getContext(),getActivity(),false);
+        progressBarBehavior.stopProgressBar();
     }
 }

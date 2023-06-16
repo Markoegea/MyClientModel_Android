@@ -25,6 +25,7 @@ import com.kingmarco.myclientmodel.Auxiliary.Classes.Static.InAppSnackBars;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFirebase.SyncRealtimeDB;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.SnackBarsInfo;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetFireStoreDB;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.ProgressBarBehavior;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
 import com.kingmarco.myclientmodel.POJOs.Clients;
 import com.kingmarco.myclientmodel.R;
@@ -35,6 +36,7 @@ public class ChangeInfoAccountFragment extends Fragment implements GetFireStoreD
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final CollectionReference clientDB = db.collection("Clientes");
     private SetLabelName setLabelName;
+    private ProgressBarBehavior progressBarBehavior;
     private ScrollView svParent;
     private Clients client;
     private EditText edtDocumentId, edtName, edtLastName, edtAge, edtPhoneNumber;
@@ -46,6 +48,7 @@ public class ChangeInfoAccountFragment extends Fragment implements GetFireStoreD
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setLabelName = (SetLabelName) getContext();
+        progressBarBehavior = (ProgressBarBehavior) getContext();
         client = ClientHolder.getYouClient();
     }
 
@@ -116,6 +119,7 @@ public class ChangeInfoAccountFragment extends Fragment implements GetFireStoreD
         btnUpload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                progressBarBehavior.startProgressBar();
                 if(!checkData()){
                     onCompleteFireStoreRequest(SnackBarsInfo.INCOMPLETE_INFO_ERROR);
                     return;
@@ -167,5 +171,6 @@ public class ChangeInfoAccountFragment extends Fragment implements GetFireStoreD
     @Override
     public void onCompleteFireStoreRequest(SnackBarsInfo snackBarsInfo) {
         InAppSnackBars.defineSnackBarInfo(snackBarsInfo,contentView,getContext(),getActivity(),true);
+        progressBarBehavior.stopProgressBar();
     }
 }

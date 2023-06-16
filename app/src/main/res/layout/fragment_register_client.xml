@@ -35,14 +35,18 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/ivClient"
+                    android:background="@drawable/circle_shadow_shape"
+                    android:elevation="8dp"
                     android:layout_marginStart="30dp"
                     android:layout_marginTop="30dp"
                     android:layout_marginEnd="30dp"
+                    android:layout_marginBottom="15dp"
                     android:orientation="vertical"
                     android:id="@+id/ll1">
                     <EditText
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
+                        android:layout_margin="12dp"
                         android:hint="Email"
                         android:inputType="textEmailAddress"
                         android:id="@+id/edtEmail"/>
@@ -64,11 +68,13 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:background="@drawable/circle_shadow_shape"
+                        android:elevation="8dp"
                         android:layout_marginTop="20dp">
                         <EditText
                             android:layout_width="wrap_content"
                             android:layout_height="50dp"
-                            android:hint="Numero de documento"
+                            android:hint="N# Documento"
                             android:inputType="number"
                             android:id="@+id/edtDocumentId"/>
                         <Spinner
@@ -81,6 +87,8 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:background="@drawable/circle_shadow_shape"
+                        android:elevation="8dp"
                         android:layout_marginTop="20dp">
                         <EditText
                             android:layout_width="160dp"
@@ -101,7 +109,9 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp">
+                        android:background="@drawable/circle_shadow_shape"
+                        android:elevation="8dp"
+                        android:layout_margin="20dp">
                         <EditText
                             android:layout_width="wrap_content"
                             android:layout_height="50dp"

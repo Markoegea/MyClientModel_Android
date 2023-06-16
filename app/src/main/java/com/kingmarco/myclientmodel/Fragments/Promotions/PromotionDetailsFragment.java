@@ -27,6 +27,7 @@ import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFirebase.SyncRealtimeDB
 import com.kingmarco.myclientmodel.Auxiliary.Enums.SnackBarsInfo;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.StockType;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetRealtimeDB;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.ProgressBarBehavior;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.StockObserver;
 import com.kingmarco.myclientmodel.POJOs.Promotions;
@@ -40,6 +41,7 @@ public class PromotionDetailsFragment extends Fragment implements StockObserver,
 
     private final FirebaseStorage storage = FirebaseStorage.getInstance();
     private SetLabelName setLabelName;
+    private ProgressBarBehavior progressBarBehavior;
     private ImageView ivPromotion;
     private TextView txtPromotionName, txtPromotionDate, txtPromotionPrice;
     private EditText edtProductQuantity;
@@ -57,6 +59,7 @@ public class PromotionDetailsFragment extends Fragment implements StockObserver,
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setLabelName = (SetLabelName) getContext();
+        progressBarBehavior = (ProgressBarBehavior) getContext();
         Bundle data = getArguments();
         if (data == null) {return;}
         long stockId = data.getLong("stock");
@@ -110,6 +113,7 @@ public class PromotionDetailsFragment extends Fragment implements StockObserver,
         cvAddToCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                progressBarBehavior.startProgressBar();
                 if (!SyncAuthDB.getInstance().isLogin()){
                     getSyncRealtimeDB(SnackBarsInfo.LOGIN_ERROR);
                     return;
@@ -160,5 +164,6 @@ public class PromotionDetailsFragment extends Fragment implements StockObserver,
     @Override
     public void getSyncRealtimeDB(SnackBarsInfo snackBarsInfo) {
         InAppSnackBars.defineSnackBarInfo(snackBarsInfo,contentView,getContext(),getActivity(),false);
+        progressBarBehavior.stopProgressBar();
     }
 }

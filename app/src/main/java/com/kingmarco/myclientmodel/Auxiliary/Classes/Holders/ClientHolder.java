@@ -20,6 +20,10 @@ public class ClientHolder {
         return youClient;
     }
 
+    public static void setClientNull(){
+        youClient = null;
+    }
+
     public static void addObserver(ClientObserver observer){
         observers.add(observer);
         notifyObservers();

@@ -30,12 +30,14 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.ClientHolder;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.GlideApp;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Static.FragmentAnimation;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.Static.InAppSnackBars;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFirebase.SyncAuthDB;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFirebase.SyncRealtimeDB;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.SnackBarsInfo;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.ClientObserver;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetFireStoreDB;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.ProgressBarBehavior;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
 import com.kingmarco.myclientmodel.POJOs.Clients;
 import com.kingmarco.myclientmodel.R;
@@ -49,6 +51,7 @@ public class ClientAccountFragment extends Fragment implements ClientObserver, G
     private NavController nav;
     private View contentView;
     private SetLabelName setLabelName;
+    private ProgressBarBehavior progressBarBehavior;
     private ImageView ivClient;
     private Button btnUploadImage;
     private CardView cvPersonalData, cvLocationData, cvLoginData, cvLogOut;
@@ -69,6 +72,7 @@ public class ClientAccountFragment extends Fragment implements ClientObserver, G
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setLabelName = (SetLabelName) getContext();
+        progressBarBehavior = (ProgressBarBehavior) getContext();
         nav = NavHostFragment.findNavController(this);
     }
 
@@ -78,7 +82,6 @@ public class ClientAccountFragment extends Fragment implements ClientObserver, G
                              Bundle savedInstanceState) {
         contentView = inflater.inflate(R.layout.fragment_client_account, container, false);
         setViews(contentView);
-        withAClient();
         setLabelName.setLabelName("Cuenta");
         // Inflate the layout for this fragment
         return contentView;
@@ -108,11 +111,6 @@ public class ClientAccountFragment extends Fragment implements ClientObserver, G
         setListeners(client);
     }
 
-
-    private void withAClient(){
-        onVariableChange(ClientHolder.getYouClient());
-    }
-
     private void setListeners(Clients client){
         /**Navigate to other fragments*/
         txtInfo.setText(client.getDirections());
@@ -125,25 +123,24 @@ public class ClientAccountFragment extends Fragment implements ClientObserver, G
         cvPersonalData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                nav.navigate(R.id.action_clientAccountFragment_to_changeInfoAccountFragment);
+                nav.navigate(R.id.changeInfoAccountFragment,null,FragmentAnimation.navigateBehavior());
             }
         });
         cvLocationData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                nav.navigate(R.id.action_clientAccountFragment_to_changeLocationDataFragment);
+                nav.navigate(R.id.changeLocationDataFragment,null,FragmentAnimation.navigateBehavior());
             }
         });
         cvLoginData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                nav.navigate(R.id.action_clientAccountFragment_to_changeLoginDataFragment);
+                nav.navigate(R.id.changeLoginDataFragment,null,FragmentAnimation.navigateBehavior());
             }
         });
         cvLogOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SyncAuthDB.getInstance().logOut();
                 onLogOut();
             }
         });
@@ -184,6 +181,7 @@ public class ClientAccountFragment extends Fragment implements ClientObserver, G
     }
 
     private void uploadImage(Clients client, Uri uri) {
+        progressBarBehavior.startProgressBar();
         StorageReference clientStorageReference = storage.getReference("Clientes/"+client.getId());
         int i = UUID.randomUUID().hashCode();
         StorageReference imageRef = clientStorageReference.child("image_"+i);
@@ -216,17 +214,19 @@ public class ClientAccountFragment extends Fragment implements ClientObserver, G
     }
 
     public void onLogOut(){
+        SyncAuthDB.getInstance().logOut();
         onCompleteFireStoreRequest(SnackBarsInfo.LOG_OUT_SUCCESS);
         if (getActivity() != null){
             getActivity().onBackPressed();
             return;
         }
         NavController nav = NavHostFragment.findNavController(this);
-        nav.navigate(R.id.loginFragment);
+        nav.navigate(R.id.loginFragment,null, FragmentAnimation.navigateBehavior());
     }
 
     @Override
     public void onCompleteFireStoreRequest(SnackBarsInfo snackBarsInfo) {
         InAppSnackBars.defineSnackBarInfo(snackBarsInfo,contentView,getContext(),getActivity(),false);
+        progressBarBehavior.stopProgressBar();
     }
 }
