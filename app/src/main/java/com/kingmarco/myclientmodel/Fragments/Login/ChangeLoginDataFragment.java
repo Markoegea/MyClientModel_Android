@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.Static.InAppSnackBars;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFirebase.SyncAuthDB;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.SnackBarsInfo;
@@ -149,8 +150,18 @@ public class ChangeLoginDataFragment extends Fragment implements GetFireStoreDB,
         if(edtOldEmail.getText().toString().isEmpty()){
             onCompleteFireStoreRequest(SnackBarsInfo.INCOMPLETE_INFO_ERROR);
             return false;
-        } else if(edtOldPassword.getText().toString().isEmpty()){
+        }
+        if(edtOldPassword.getText().toString().isEmpty()){
             onCompleteFireStoreRequest(SnackBarsInfo.INCOMPLETE_INFO_ERROR);
+            return false;
+        }
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null){
+            onCompleteFireStoreRequest(SnackBarsInfo.LOGIN_ERROR);
+            return false;
+        }
+        if(!(edtOldEmail.getText().toString().equals(user.getEmail()))){
+            onCompleteFireStoreRequest(SnackBarsInfo.EMAIL_SERVER_ERROR);
             return false;
         }
         return true;

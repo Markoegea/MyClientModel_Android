@@ -17,15 +17,15 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.kingmarco.myclientmodel.Adapters.MessagesAdapter;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.ChatHolder;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.MessagesHolder;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.ClientHolder;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.Static.NotificationManager;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFirebase.SyncAuthDB;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFirebase.SyncRealtimeDB;
 import com.kingmarco.myclientmodel.POJOs.TimestampDeserializer;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.MessagesStatus;
-import com.kingmarco.myclientmodel.Auxiliary.Interfaces.ChatObserver;
+import com.kingmarco.myclientmodel.Auxiliary.Interfaces.MessagesObserver;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.SetLabelName;
-import com.kingmarco.myclientmodel.POJOs.Chats;
 import com.kingmarco.myclientmodel.POJOs.Clients;
 import com.kingmarco.myclientmodel.POJOs.Messages;
 import com.kingmarco.myclientmodel.R;
@@ -33,7 +33,7 @@ import com.kingmarco.myclientmodel.R;
 import java.util.ArrayList;
 
 /**The fragment responsible for show the messages from the firebase*/
-public class ChatFragment extends Fragment implements ChatObserver {
+public class MessagesFragment extends Fragment implements MessagesObserver {
     private SetLabelName setLabelName;
     private View contentView;
     private ListView lvMessages;
@@ -42,7 +42,7 @@ public class ChatFragment extends Fragment implements ChatObserver {
     private DatabaseReference databaseReference;
     private MessagesAdapter messagesAdapter;
 
-    public ChatFragment() {
+    public MessagesFragment() {
         // Required empty public constructor
     }
 
@@ -54,7 +54,7 @@ public class ChatFragment extends Fragment implements ChatObserver {
         messagesAdapter = new MessagesAdapter(this);
         Clients clients = ClientHolder.getYouClient();
         if(clients == null){return;}
-        databaseReference = FirebaseDatabase.getInstance().getReference("chats/"+clients.getMessagingId()+"/messages");
+        databaseReference = FirebaseDatabase.getInstance().getReference(ClientHolder.getYouClient().getId()+"/Chats/");
     }
 
     @Override
@@ -77,7 +77,9 @@ public class ChatFragment extends Fragment implements ChatObserver {
                 if(!SyncAuthDB.getInstance().isLogin()){return;}
                 if(ClientHolder.getYouClient() == null){return;}
                 DatabaseReference messagesReference = databaseReference.push();
-                Messages messages = new Messages(clients.getMessagingId(),
+                Messages messages = new Messages(
+                        messagesReference.getKey(),
+                        clients.getMessagingId(),
                         clients.getName(),
                         clients.getImageUrl(),
                         messageText,
@@ -110,40 +112,29 @@ public class ChatFragment extends Fragment implements ChatObserver {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        ChatHolder.addObserver(this);
+    public void onResume() {
+        super.onResume();
+        MessagesHolder.addObserver(this);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        ChatHolder.removeObserver(this);
+        MessagesHolder.removeObserver(this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        ChatHolder.removeObserver(this);
+        MessagesHolder.removeObserver(this);
     }
 
     @Override
     public void onMessagesChange(ArrayList<Messages> arrayList) {
         if(!SyncAuthDB.getInstance().isLogin()){return;}
         if(ClientHolder.getYouClient() == null){return;}
-        for (Messages message : arrayList){
-            if(message.getSenderId() != ClientHolder.getYouClient().getMessagingId()
-                    && message.getStatus() != MessagesStatus.SEEN){
-                message.setStatus(MessagesStatus.SEEN);
-                NotificationManager.getInstance().deleteMessagesNotification(message.getSenderId());
-                databaseReference.child(message.getId()).setValue(message);
-            }
-        }
+        if (arrayList == null){return;}
+        SyncRealtimeDB.uploadChatChanges(MessagesStatus.SEEN,MessagesStatus.SEEN,arrayList,databaseReference);
         messagesAdapter.setDatabase(arrayList);
-    }
-
-    @Override
-    public void onChatChange(Chats chats) {
-
     }
 }

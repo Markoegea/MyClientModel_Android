@@ -7,73 +7,95 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.CartHolder;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.ChatHolder;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.MessagesHolder;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.ClientHolder;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Static.FragmentAnimation;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.Static.NotificationManager;
+import com.kingmarco.myclientmodel.Auxiliary.Enums.MessagesStatus;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.SnackBarsInfo;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.StockType;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.GetRealtimeDB;
 import com.kingmarco.myclientmodel.POJOs.Carts;
-import com.kingmarco.myclientmodel.POJOs.Chats;
 import com.kingmarco.myclientmodel.POJOs.Messages;
 import com.kingmarco.myclientmodel.POJOs.Stock;
 import com.kingmarco.myclientmodel.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class SyncRealtimeDB {
 
-    public static ValueEventListener newChatListener(@NonNull DatabaseReference destinyReference,
-                                                     @NonNull GetRealtimeDB getRealtimeDB){
+    /**Chat Firebase Methods*/
+    public static ValueEventListener newChatListener(@NonNull GetRealtimeDB getRealtimeDB){
         return new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(!SyncAuthDB.getInstance().isLogin()){return;}
                 if(ClientHolder.getYouClient() == null){return;}
-                if (!dataSnapshot.exists()){
-                    ChatHolder.newChat(destinyReference);
-                    return;
+                if (!dataSnapshot.exists()){return;}
+                MessagesHolder.clearMessagesList();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    Messages message = snapshot.getValue(Messages.class);
+                    if(message == null){return;}
+                    MessagesHolder.addSingleMessage(message);
                 }
-                if (ChatHolder.getChat() == null){
-                    ChatHolder.addChat(new Chats());
-                }
-                ChatHolder.getChat().setClientID(dataSnapshot.child("clientID").getValue(Integer.class));
-                ChatHolder.getChat().setImage(dataSnapshot.child("image").getValue(String.class));
-                ChatHolder.getChat().setName(dataSnapshot.child("name").getValue(String.class));
-                DatabaseReference lastMessage = dataSnapshot.child("messages").getRef();
-                lastMessage.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        ChatHolder.clearMessagesList();
-                        for (DataSnapshot dataSnapshot : snapshot.getChildren()){
-                            Messages message = dataSnapshot.getValue(Messages.class);
-                            if(message == null){return;}
-                            message.setId(dataSnapshot.getKey());
-                            ChatHolder.addSingleMessage(message);
-                            ChatHolder.getChat().setMessages(message);
-                            NotificationManager.getInstance().sendNotifications();
-                        }
-                        ChatHolder.notifyObserversMessages();
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        getRealtimeDB.getSyncRealtimeDB(SnackBarsInfo.MESSAGES_ERROR);
-                    }
-                });
+                MessagesHolder.notifyObserversMessages();
+                uploadChatChanges(MessagesHolder.getMyMessages(),dataSnapshot.getRef());
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 getRealtimeDB.getSyncRealtimeDB(SnackBarsInfo.CHATS_ERROR);
             }
         };
+    }
+
+    private static void uploadChatChanges(ArrayList<Messages> messages,
+                                          DatabaseReference databaseReference){
+        boolean hasChange = false;
+        for (Messages message : messages){
+            if(message.getSenderId() == ClientHolder.getYouClient().getMessagingId()){continue;}
+            if (message.getStatus() != MessagesStatus.SENT){continue;}
+            message.setStatus(MessagesStatus.RECEIVED);
+            hasChange = true;
+        }
+        if (hasChange){
+            NotificationManager.getInstance().sendNotifications();
+            SyncRealtimeDB.uploadChat(messages,databaseReference);
+        }
+    }
+
+    public static void uploadChatChanges(MessagesStatus originalStatus,
+                                         MessagesStatus setStatus,
+                                         ArrayList<Messages> messages,
+                                         DatabaseReference databaseReference){
+        boolean hasChange = false;
+        for (Messages message : messages){
+            if(message.getSenderId() == ClientHolder.getYouClient().getMessagingId()){continue;}
+            if (message.getStatus() == originalStatus){continue;}
+            message.setStatus(setStatus);
+            NotificationManager.getInstance().deleteMessagesNotification(message.getSenderId());
+            hasChange = true;
+        }
+        if (hasChange){
+            SyncRealtimeDB.uploadChat(messages,databaseReference);
+        }
+    }
+
+    private static void uploadChat(ArrayList<Messages> messages, DatabaseReference databaseReference){
+        Map<String,Messages> allMessages = new HashMap<>();
+        for (Messages message : messages){
+            allMessages.put(message.getId(),message);
+        }
+        databaseReference.setValue(allMessages);
     }
 
     /**Cart Firebase Methods*/
@@ -85,8 +107,8 @@ public class SyncRealtimeDB {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(!SyncAuthDB.getInstance().isLogin()){return;}
                 if(ClientHolder.getYouClient() == null){return;}
-                CartHolder.clearCartList();
                 if (!snapshot.exists()){return;}
+                CartHolder.clearCartList();
                 for (DataSnapshot dataSnapshot: snapshot.getChildren()){
                     Carts newCart = dataSnapshot.getValue(Carts.class);
                     if (newCart == null){continue;}
@@ -117,22 +139,22 @@ public class SyncRealtimeDB {
             stockList = new ArrayList<>();
             cart.getPurchasedItemsId().put(stockType.name(),stockList);
         }
-        for (int i = 0; i<quantity;i++){
+
+        for (int i = 0; i<quantity; i++){
             stockList.add(stock.getId());
             cart.setTotalPrice(cart.getTotalPrice()+stock.getPrice());
         }
-        cart.setLastUpdateBy(ClientHolder.getYouClient().getName()+
-                ", "+
-                ClientHolder.getYouClient().getLastName());
 
-        String path = "Carritos/"+ClientHolder.getYouClient().getId()+"/"+cart.getId();
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance()
-                .getReference(path);
+        cart.setLastUpdateBy(ClientHolder.getYouClient().getName()+
+                ", "+ ClientHolder.getYouClient().getLastName());
+
+        String path = ClientHolder.getYouClient().getId()+"/Carritos/"+cart.getId();
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(path);
         databaseReference.setValue(cart).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
                 NavController navController = NavHostFragment.findNavController(fragment);
-                navController.navigate(R.id.cartFragment);
+                navController.navigate(R.id.cartFragment,null, FragmentAnimation.navigateBehavior());
                 getRealtimeDB.getSyncRealtimeDB(SnackBarsInfo.UPLOAD_SUCCESS);
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -147,9 +169,8 @@ public class SyncRealtimeDB {
                                          @NonNull GetRealtimeDB getRealtimeDB){
         if(!SyncAuthDB.getInstance().isLogin()){return;}
         if(ClientHolder.getYouClient() == null){return;}
-        String path = "Carritos/"+ClientHolder.getYouClient().getId()+"/"+carts.getId();
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance()
-                .getReference(path);
+        String path = ClientHolder.getYouClient().getId()+"/Carritos/"+carts.getId();
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(path);
         databaseReference.setValue(carts)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -169,9 +190,8 @@ public class SyncRealtimeDB {
         if(!SyncAuthDB.getInstance().isLogin()){return;}
         if(ClientHolder.getYouClient() == null){return;}
 
-        String path = "Carritos/"+ClientHolder.getYouClient().getId()+"/"+carts.getId();
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance()
-                .getReference(path);
+        String path = ClientHolder.getYouClient().getId()+"/Carritos/"+carts.getId();
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(path);
         databaseReference.setValue(null)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -195,10 +215,5 @@ public class SyncRealtimeDB {
     public static void startListening(DatabaseReference destinyReference, ValueEventListener eventListener){
         if(destinyReference == null || eventListener == null){return;}
         destinyReference.addValueEventListener(eventListener);
-    }
-
-    public static void uploadChat(DatabaseReference destinyReference, String information, String field){
-        if (destinyReference == null){return;}
-        destinyReference.child(field).setValue(information);
     }
 }

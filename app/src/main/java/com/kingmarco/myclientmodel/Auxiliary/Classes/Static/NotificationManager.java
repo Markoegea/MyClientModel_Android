@@ -29,10 +29,11 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.kingmarco.myclientmodel.Activity.MainActivity;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.GlideApp;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.ChatHolder;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.MessagesHolder;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.ClientHolder;
 import com.kingmarco.myclientmodel.Auxiliary.Enums.MessagesStatus;
 import com.kingmarco.myclientmodel.Auxiliary.Interfaces.NotificationTemplate;
+import com.kingmarco.myclientmodel.POJOs.Clients;
 import com.kingmarco.myclientmodel.POJOs.Messages;
 import com.kingmarco.myclientmodel.R;
 
@@ -58,26 +59,18 @@ public class NotificationManager implements NotificationTemplate {
     }
 
     public void sendNotifications(){
-        Messages message = ChatHolder.getChat().getMessages();
+        int lastIndex = MessagesHolder.getMyMessages().size() - 1;
+        Messages message = MessagesHolder.getMyMessages().get(lastIndex);
         if(message == null){return;}
-        DatabaseReference databaseReference = FirebaseDatabase
-                .getInstance()
-                .getReference("chats/"+ChatHolder.getChat().getClientID()+"/messages");
-        if(message.getSenderId() != ClientHolder.getYouClient().getMessagingId()){
-            if (message.getStatus() == MessagesStatus.SENT){
-                message.setStatus(MessagesStatus.RECEIVED);
-                String title = "Nuevo Mensaje de "+message.getSenderName();
-                String text = message.getText();
-                int clientId = message.getSenderId();
-                newMessagesNotification(
-                        title,
-                        text,
-                        clientId,
-                        message.getImageUrl()
-                );
-                databaseReference.child(message.getId()).setValue(message);
-            }
-        }
+        String title = "Nuevo Mensaje de "+message.getSenderName();
+        String text = message.getText();
+        int clientId = message.getSenderId();
+        newMessagesNotification(
+                title,
+                text,
+                clientId,
+                message.getImageUrl()
+        );
         createMessageSummary();
     }
 

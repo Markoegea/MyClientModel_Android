@@ -69,9 +69,9 @@ public class InAppSnackBars {
                 InAppSnackBars.showSnackBar(contentView, context, R.color.white, R.color.red,
                         "No se puedo cargar los chats");
                 break;
-            case MESSAGES_ERROR:
+            case EMAIL_SERVER_ERROR:
                 InAppSnackBars.showSnackBar(contentView, context, R.color.white, R.color.red,
-                        "No se puedo cargar los mensajes del chat");
+                        "El email antiguo no concuerda con el tuyo");
                 break;
             case EMAILS_EQUALS_ERROR:
                 InAppSnackBars.showSnackBar(contentView, context, R.color.white, R.color.red,

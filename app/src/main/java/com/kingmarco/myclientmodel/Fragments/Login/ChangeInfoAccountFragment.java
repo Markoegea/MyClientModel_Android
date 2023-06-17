@@ -158,8 +158,6 @@ public class ChangeInfoAccountFragment extends Fragment implements GetFireStoreD
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()){
-                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("chats/"+client.getMessagingId());
-                    SyncRealtimeDB.uploadChat(databaseReference,client.getName(),"name");
                     onCompleteFireStoreRequest(SnackBarsInfo.UPDATE_SUCCESS);
                 } else{
                     onCompleteFireStoreRequest(SnackBarsInfo.DATA_ERROR);

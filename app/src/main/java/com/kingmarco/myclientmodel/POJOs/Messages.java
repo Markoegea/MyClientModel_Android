@@ -14,7 +14,8 @@ public class Messages {
     public Messages() {
     }
 
-    public Messages(Integer senderId, String senderName, String imageUrl, String text, MessagesStatus status, TimestampDeserializer timestamp) {
+    public Messages(String id, Integer senderId, String senderName, String imageUrl, String text, MessagesStatus status, TimestampDeserializer timestamp) {
+        this.id = id;
         this.senderId = senderId;
         this.senderName = senderName;
         this.imageUrl = imageUrl;

@@ -28,36 +28,49 @@
                 android:layout_marginTop="30dp"
                 android:layout_centerHorizontal="true"
                 android:id="@+id/btnUploadImage"/>
-
-            <TextView
+            <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Ubicacion:"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:fontFamily="sans-serif-medium"
-                android:textSize="18sp"
                 android:layout_below="@id/btnUploadImage"
-                android:layout_marginTop="20dp"
-                android:layout_marginStart="10dp"
-                android:id="@+id/txtUbication"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="No tienes una ubicacion"
-                android:textColor="@color/black"
-                android:fontFamily="sans-serif-medium"
-                android:textSize="17sp"
-                android:layout_below="@id/btnUploadImage"
-                android:layout_toEndOf="@id/txtUbication"
-                android:layout_marginTop="20dp"
-                android:layout_marginStart="10dp"
-                android:id="@+id/txtInfo"/>
+                android:id="@+id/rl1">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ubicacion:"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:fontFamily="sans-serif-medium"
+                    android:textSize="18sp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_centerVertical="true"
+                    android:id="@+id/txtUbication"/>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/circle_shadow_shape"
+                    android:layout_toEndOf="@id/txtUbication"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="15dp"
+                    android:elevation="8dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="No tienes una ubicacion"
+                        android:textColor="@color/black"
+                        android:fontFamily="sans-serif-medium"
+                        android:textSize="17sp"
+                        android:id="@+id/txtInfo"/>
+                </LinearLayout>
+            </RelativeLayout>
 
             <androidx.cardview.widget.CardView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/txtInfo"
+                android:layout_below="@id/rl1"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="30dp"
                 android:id="@+id/cvPersonalData">

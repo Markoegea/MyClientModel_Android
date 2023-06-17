@@ -119,6 +119,7 @@ public class LoginFragment extends Fragment implements GetAuthDB, GetFireStoreDB
                 if (!SyncAuthDB.getInstance().isLogin()){return;}
                 if (task.isSuccessful()){
                     if (task.getResult().exists()){
+                        if (getActivity() != null){getActivity().onBackPressed();}
                         NavController navController = NavHostFragment.findNavController(LoginFragment.this);
                         navController.navigate(R.id.clientAccountFragment,null,FragmentAnimation.navigateBehavior());
                         onCompleteFireStoreRequest(SnackBarsInfo.LOGIN_SUCCESS);

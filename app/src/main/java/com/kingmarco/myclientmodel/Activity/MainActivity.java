@@ -24,12 +24,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.CartHolder;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.ChatHolder;
+import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.MessagesHolder;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.ClientHolder;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.Static.FragmentAnimation;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.Static.InAppSnackBars;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.Static.NotificationManager;
-import com.kingmarco.myclientmodel.Auxiliary.Classes.Holders.StockHolder;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFirebase.SyncAuthDB;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFirebase.SyncFireStoreDB;
 import com.kingmarco.myclientmodel.Auxiliary.Classes.SyncFirebase.SyncRealtimeDB;
@@ -44,7 +43,7 @@ import com.kingmarco.myclientmodel.POJOs.Clients;
 import com.kingmarco.myclientmodel.R;
 
 
-//TODO: The email field in the client and employee
+//TODO: The email field in the client and employee and refactor the realtimeDB data (Cart,Chart)
 public class MainActivity extends AppCompatActivity implements SetLabelName, GetAuthDB, ClientObserver,
         GetRealtimeDB, ProgressBarBehavior {
 
@@ -220,8 +219,7 @@ public class MainActivity extends AppCompatActivity implements SetLabelName, Get
     }
 
     private void stopListeners(){
-        ChatHolder.setChatNull();
-        ChatHolder.clearMessagesList();
+        MessagesHolder.clearMessagesList();
         CartHolder.clearCartList();
         SyncRealtimeDB.stopListening(chatReference, chatListener);
         SyncRealtimeDB.stopListening(cartReference, cartListener);
@@ -234,12 +232,12 @@ public class MainActivity extends AppCompatActivity implements SetLabelName, Get
     private void startListeners(Clients client){
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         if (chatReference == null || chatListener == null){
-            chatReference = firebaseDatabase.getReference("chats/"+client.getMessagingId());
-            chatListener = SyncRealtimeDB.newChatListener(chatReference,this);
+            chatReference = firebaseDatabase.getReference(client.getId()+"/Chats/");
+            chatListener = SyncRealtimeDB.newChatListener(this);
             SyncRealtimeDB.startListening(chatReference,chatListener);
         }
         if (cartReference == null || cartListener == null){
-            cartReference = firebaseDatabase.getReference("Carritos/"+client.getId());
+            cartReference = firebaseDatabase.getReference(client.getId()+"/Carritos/");
             cartListener = SyncRealtimeDB.newCartListener(this);
             SyncRealtimeDB.startListening(cartReference,cartListener);
         }

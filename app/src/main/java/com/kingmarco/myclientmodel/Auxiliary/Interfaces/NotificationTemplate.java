@@ -1,7 +1,5 @@
 package com.kingmarco.myclientmodel.Auxiliary.Interfaces;
 
-import com.kingmarco.myclientmodel.POJOs.Chats;
-
 public interface NotificationTemplate {
     void createNotificationChannel();
     void checkNotificationPermission();
