@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Fragments.Login.ChangeLocationDataFragment">
+
+    <!--MapsLayout!-->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/rlMap">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/rl1">
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="30dp"
+                android:layout_centerHorizontal="true"
+                android:id="@+id/radioMaps">
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Escribir\nDireccion\nManual"
+                    android:textSize="20sp"
+                    android:checked="true"
+                    android:layout_margin="10dp"
+                    android:id="@+id/radioWriteDirections"/>
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Escribir\nDireccion\nCon Mapa"
+                    android:textSize="20sp"
+                    android:layout_margin="10dp"
+                    android:id="@+id/radioWriteMaps"/>
+            </RadioGroup>
+            <!--Maps Directions!-->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/radioMaps"
+                android:visibility="gone"
+                android:id="@+id/rlWriteMap">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Por favor busca tu lugar de recidencia en el mapa, si tiene errores lo puedes editar."
+                    android:textSize="17sp"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:textAlignment="center"
+                    android:layout_margin="10dp"
+                    android:id="@+id/txtTitle1"/>
+                <!--Maps Directions!-->
+                <com.google.android.gms.maps.MapView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@id/txtTitle1"
+                    android:apiKey="@string/maps_api"
+                    android:scrollbars="none"
+                    android:isScrollContainer="false"
+                    android:clickable="true"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:id="@+id/mpClient"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/circle_shadow_shape"
+                    android:layout_marginBottom="10dp"
+                    android:layout_below="@id/txtTitle1"
+                    android:layout_margin="5dp"
+                    android:elevation="8dp">
+                    <EditText
+                        android:id="@+id/edtLocation"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Direccion"
+                        android:textColor="@color/white"
+                        android:textSize="20sp" />
+                </LinearLayout>
+            </RelativeLayout>
+            <!--Manual Directions!-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="30dp"
+                android:visibility="visible"
+                android:orientation="vertical"
+                android:layout_below="@id/radioMaps"
+                android:id="@+id/llWriteDirections">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/circle_shadow_shape"
+                    android:layout_marginBottom="10dp"
+                    android:elevation="8dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_marginEnd="6dp"
+                    android:layout_marginTop="6dp">
+                    <EditText
+                        android:id="@+id/edtCountry"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Pais"
+                        android:textSize="25sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/circle_shadow_shape"
+                    android:layout_marginBottom="10dp"
+                    android:elevation="8dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_marginEnd="6dp"
+                    android:layout_marginTop="6dp">
+                    <EditText
+                        android:id="@+id/edtCity"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Ciudad"
+                        android:textSize="25sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/circle_shadow_shape"
+                    android:layout_marginBottom="10dp"
+                    android:elevation="8dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_marginEnd="6dp"
+                    android:layout_marginTop="6dp">
+                    <EditText
+                        android:id="@+id/edtAddress"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Direccion"
+                        android:textSize="25sp" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </RelativeLayout>
+        <!--ButtonLayout!-->
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/circle_shadow_shape"
+            android:layout_marginBottom="10dp"
+            android:elevation="8dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp"
+            android:layout_marginTop="6dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true">
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_upload"
+                android:backgroundTint="@color/purple_500"
+                android:layout_margin="5dp"
+                android:id="@+id/btnUpdate"/>
+        </RelativeLayout>
+    </RelativeLayout>
+</FrameLayout>

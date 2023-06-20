@@ -41,8 +41,8 @@ public class SyncRealtimeDB {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(!SyncAuthDB.getInstance().isLogin()){return;}
                 if(ClientHolder.getYouClient() == null){return;}
-                if (!dataSnapshot.exists()){return;}
                 MessagesHolder.clearMessagesList();
+                if (!dataSnapshot.exists()){return;}
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()){
                     Messages message = snapshot.getValue(Messages.class);
                     if(message == null){return;}
@@ -107,8 +107,8 @@ public class SyncRealtimeDB {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(!SyncAuthDB.getInstance().isLogin()){return;}
                 if(ClientHolder.getYouClient() == null){return;}
-                if (!snapshot.exists()){return;}
                 CartHolder.clearCartList();
+                if (!snapshot.exists()){return;}
                 for (DataSnapshot dataSnapshot: snapshot.getChildren()){
                     Carts newCart = dataSnapshot.getValue(Carts.class);
                     if (newCart == null){continue;}

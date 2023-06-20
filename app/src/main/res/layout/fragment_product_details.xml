@@ -47,41 +47,50 @@
                android:layout_marginBottom="20dp" />
 
            <LinearLayout
+               android:id="@+id/ll1"
                android:layout_width="wrap_content"
                android:layout_height="wrap_content"
                android:layout_below="@id/vpImagesProduct"
-               android:layout_margin="20dp"
-               android:id="@+id/ll1">
+               android:layout_marginStart="10dp"
+               android:layout_marginTop="20dp"
+               android:layout_marginEnd="10dp"
+               android:layout_marginBottom="20dp"
+               android:background="@drawable/circle_shadow_shape"
+               android:elevation="8dp">
+
                <TextView
                    android:layout_width="wrap_content"
                    android:layout_height="wrap_content"
                    android:text="Quiero:"
                    android:textSize="25sp"
-                   android:textStyle="italic"/>
+                   android:textStyle="italic" />
+
                <EditText
+                   android:id="@+id/edtProductQuantity"
                    android:layout_width="wrap_content"
                    android:layout_height="wrap_content"
-                   android:text="1"
-                   android:textSize="25sp"
-                   android:textStyle="bold"
-                   android:inputType="number"
                    android:layout_marginStart="20dp"
                    android:layout_marginEnd="20dp"
-                   android:id="@+id/edtProductQuantity"/>
+                   android:inputType="number"
+                   android:text="1"
+                   android:textSize="25sp"
+                   android:textStyle="bold" />
+
                <TextView
                    android:layout_width="wrap_content"
                    android:layout_height="wrap_content"
                    android:text="Disponible:"
                    android:textSize="25sp"
-                   android:textStyle="italic"/>
+                   android:textStyle="italic" />
+
                <TextView
+                   android:id="@+id/txtProductAvailable"
                    android:layout_width="wrap_content"
                    android:layout_height="wrap_content"
+                   android:layout_marginStart="20dp"
                    android:text="10"
                    android:textSize="25sp"
-                   android:textStyle="bold"
-                   android:layout_marginStart="20dp"
-                   android:id="@+id/txtProductAvailable"/>
+                   android:textStyle="bold" />
            </LinearLayout>
 
            <TextView
@@ -156,6 +165,7 @@
                <TextView
                    android:layout_width="wrap_content"
                    android:layout_height="wrap_content"
+                   android:textColor="@color/black"
                    android:text="@string/side_sheet_behavior"
                    android:fontFamily="sans-serif-medium"
                    android:textSize="16sp"
